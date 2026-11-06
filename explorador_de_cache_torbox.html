@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torbox Cache Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --accent-color: #bb86fc;
+            --accent-hover: #9c6ce0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .surface {
+            background-color: var(--surface-color);
+        }
+
+        .accent-text {
+            color: var(--accent-color);
+        }
+
+        .accent-bg {
+            background-color: var(--accent-color);
+            color: #000;
+        }
+
+        .accent-bg:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .accent-border {
+            border-color: var(--accent-color);
+        }
+
+        .focus-ring:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.4);
+            border-color: var(--accent-color);
+        }
+
+        .poster-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .poster-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Modal Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-backdrop {
+            animation: fadeIn 0.3s ease forwards;
+        }
+        .modal-content {
+            animation: slideUp 0.3s ease forwards;
+        }
+
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--accent-color);
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loader-lg {
+            width: 48px;
+            height: 48px;
+            border-width: 4px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navbar -->
+    <nav class="surface border-b border-gray-800 p-4 sticky top-0 z-10 shadow-md">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 accent-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                <h1 class="text-xl font-bold tracking-wide">Torbox Cache <span class="font-light text-gray-400">Explorador</span></h1>
+            </div>
+            <div>
+                <button id="settingsBtn" class="text-gray-400 hover:text-white transition" aria-label="Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 py-8">
+        
+        <!-- Setup Section (API Key) -->
+        <div id="setupSection" class="surface rounded-xl p-6 mb-8 shadow-lg max-w-3xl mx-auto border border-gray-800 hidden">
+            <h2 class="text-xl font-semibold mb-2">Configuração</h2>
+            <p class="text-sm text-gray-400 mb-4">Insira sua Chave de API do Torbox para verificar a disponibilidade de cache. Isso fica armazenado localmente no seu navegador.</p>
+            <div class="flex flex-col md:flex-row gap-3">
+                <input type="password" id="apiKeyInput" placeholder="Bearer eyJhb..." 
+                       class="flex-1 bg-[#121212] border border-gray-700 rounded-lg px-4 py-2 text-white focus-ring placeholder-gray-600 transition">
+                <button id="saveApiBtn" class="accent-bg font-medium rounded-lg px-6 py-2 transition shadow-md whitespace-nowrap">
+                    Salvar Chave
+                </button>
+            </div>
+            <div id="setupMsg" class="mt-2 text-sm text-green-400 hidden">Chave de API salva no localStorage!</div>
+        </div>
+
+        <!-- Search Controls -->
+        <div class="max-w-3xl mx-auto mb-10">
+            <form id="searchForm" class="flex flex-col sm:flex-row gap-3 shadow-lg rounded-xl">
+                <select id="searchType" class="surface border border-gray-700 rounded-lg px-4 py-3 text-white focus-ring sm:w-1/4 outline-none cursor-pointer appearance-none">
+                    <option value="movie">Filmes</option>
+                    <option value="series">Séries</option>
+                </select>
+                <div class="relative flex-1">
+                    <input type="text" id="searchInput" placeholder="Pesquise por um filme ou série..." 
+                           class="w-full surface border border-gray-700 rounded-lg pl-4 pr-12 py-3 text-white focus-ring placeholder-gray-500 transition outline-none">
+                    <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-white transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Info & Loading -->
+        <div id="resultsInfo" class="mb-4 text-gray-400 font-medium hidden"></div>
+        <div id="mainLoader" class="flex flex-col items-center justify-center py-16 hidden">
+            <div class="loader loader-lg mb-4"></div>
+            <p class="text-gray-400">Buscando metadados...</p>
+        </div>
+
+        <!-- Posters Grid -->
+        <div id="postersGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+            <!-- Items injected by JS -->
+        </div>
+
+        <div id="noResultsMsg" class="text-center py-16 text-gray-500 hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-lg">Nenhum resultado encontrado.</p>
+        </div>
+    </main>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <!-- Backdrop -->
+        <div id="modalBackdrop" class="absolute inset-0 bg-black bg-opacity-80 backdrop-blur-sm modal-backdrop"></div>
+        
+        <!-- Modal Content -->
+        <div class="surface rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col relative z-10 modal-content shadow-2xl border border-gray-700 overflow-hidden">
+            
+            <!-- Header -->
+            <div class="p-6 border-b border-gray-800 flex justify-between items-start bg-[#1e1e1e] relative z-20">
+                <div class="pr-8">
+                    <h3 id="modalTitle" class="text-2xl font-bold text-white mb-1">Título</h3>
+                    <p id="modalSubtitle" class="text-sm text-gray-400 flex items-center gap-2">
+                        <span id="modalTypeBadge" class="bg-gray-800 px-2 py-0.5 rounded text-xs uppercase tracking-wider font-semibold">TIPO</span>
+                        <span id="modalYear">YYYY</span>
+                    </p>
+                    <p id="seriesNote" class="text-xs text-yellow-500 mt-2 hidden">Verificando cache para Temporada 1, Episódio 1.</p>
+                </div>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 rounded-full p-2 transition absolute top-6 right-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Body (Scrollable) -->
+            <div class="p-6 overflow-y-auto flex-1 bg-[#121212]">
+                
+                <!-- Loading State -->
+                <div id="modalLoader" class="flex flex-col items-center justify-center py-12">
+                    <div class="loader mb-4"></div>
+                    <p id="modalLoaderText" class="text-gray-400 text-sm">Buscando fontes no Torrentio...</p>
+                </div>
+                
+                <!-- Error State -->
+                <div id="modalError" class="hidden text-center py-12">
+                    <div class="inline-block bg-red-900 bg-opacity-20 text-red-400 border border-red-800 rounded-lg p-4">
+                        <p id="modalErrorText">Ocorreu um erro.</p>
+                    </div>
+                </div>
+
+                <!-- Streams List -->
+                <div id="streamsList" class="flex flex-col gap-3 hidden">
+                    <!-- Stream Cards Injected Here -->
+                </div>
+                
+                <!-- Empty State -->
+                <div id="streamsEmpty" class="hidden text-center py-16">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    <h4 class="text-xl font-semibold text-gray-300 mb-2">Nenhum Stream em Cache Encontrado</h4>
+                    <p class="text-gray-500 max-w-md mx-auto">Não encontramos nenhum arquivo em cache no Torbox pronto para streaming instantâneo via Torrentio.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // --- State ---
+        let torboxApiKey = localStorage.getItem('torbox_api_key') || '';
+        let currentResults = [];
+
+        // --- DOM Elements ---
+        const setupSection = document.getElementById('setupSection');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const saveApiBtn = document.getElementById('saveApiBtn');
+        const setupMsg = document.getElementById('setupMsg');
+        
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const searchType = document.getElementById('searchType');
+        
+        const postersGrid = document.getElementById('postersGrid');
+        const mainLoader = document.getElementById('mainLoader');
+        const resultsInfo = document.getElementById('resultsInfo');
+        const noResultsMsg = document.getElementById('noResultsMsg');
+        
+        const detailsModal = document.getElementById('detailsModal');
+        const modalBackdrop = document.getElementById('modalBackdrop');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSubtitle = document.getElementById('modalSubtitle');
+        const modalYear = document.getElementById('modalYear');
+        const modalTypeBadge = document.getElementById('modalTypeBadge');
+        const seriesNote = document.getElementById('seriesNote');
+        
+        const modalLoader = document.getElementById('modalLoader');
+        const modalLoaderText = document.getElementById('modalLoaderText');
+        const modalError = document.getElementById('modalError');
+        const modalErrorText = document.getElementById('modalErrorText');
+        const streamsList = document.getElementById('streamsList');
+        const streamsEmpty = document.getElementById('streamsEmpty');
+
+        // --- Initialization ---
+        function init() {
+            if (torboxApiKey) {
+                apiKeyInput.value = torboxApiKey;
+            } else {
+                setupSection.classList.remove('hidden');
+            }
+
+            // Setup listeners
+            settingsBtn.addEventListener('click', () => {
+                setupSection.classList.toggle('hidden');
+                if(!setupSection.classList.contains('hidden')) apiKeyInput.focus();
+            });
+
+            saveApiBtn.addEventListener('click', saveApiKey);
+            
+            searchForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                performSearch();
+            });
+
+            closeModalBtn.addEventListener('click', closeModal);
+            modalBackdrop.addEventListener('click', closeModal);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !detailsModal.classList.contains('hidden')) {
+                    closeModal();
+                }
+            });
+        }
+
+        function saveApiKey() {
+            const val = apiKeyInput.value.trim();
+            if (val) {
+                localStorage.setItem('torbox_api_key', val);
+                torboxApiKey = val;
+                setupMsg.classList.remove('hidden');
+                setTimeout(() => setupMsg.classList.add('hidden'), 3000);
+            }
+        }
+
+        // --- Search Logic (Cinemeta) ---
+        async function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+
+            const type = searchType.value;
+            const url = `https://v3-cinemeta.strem.io/catalog/${type}/top/search=${encodeURIComponent(query)}.json`;
+
+            // UI Reset
+            postersGrid.innerHTML = '';
+            resultsInfo.classList.add('hidden');
+            noResultsMsg.classList.add('hidden');
+            mainLoader.classList.remove('hidden');
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+                const data = await res.json();
+                
+                currentResults = data.metas || [];
+                renderGrid(currentResults, type);
+            } catch (err) {
+                console.error("Search Error:", err);
+                resultsInfo.textContent = "Falha ao buscar resultados. Verifique o console.";
+                resultsInfo.classList.remove('hidden');
+            } finally {
+                mainLoader.classList.add('hidden');
+            }
+        }
+
+        function renderGrid(metas, type) {
+            if (metas.length === 0) {
+                noResultsMsg.classList.remove('hidden');
+                return;
+            }
+
+            resultsInfo.textContent = `Encontrados ${metas.length} resultados para "${searchInput.value}"`;
+            resultsInfo.classList.remove('hidden');
+
+            metas.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "poster-card bg-[#1e1e1e] rounded-xl overflow-hidden cursor-pointer relative group flex flex-col h-full border border-transparent hover:border-[#bb86fc]";
+                
+                // Fallback for missing poster
+                const posterUrl = item.poster || `https://placehold.co/400x600/1e1e1e/888888?text=${encodeURIComponent(item.name)}`;
+                
+                card.innerHTML = `
+                    <div class="aspect-[2/3] w-full overflow-hidden bg-gray-900">
+                        <img src="${posterUrl}" alt="${item.name}" loading="lazy" class="w-full h-full object-cover transition duration-300 group-hover:opacity-80" onerror="this.src='https://placehold.co/400x600/1e1e1e/888888?text=No+Image'">
+                    </div>
+                    <div class="p-3 flex-1 flex flex-col">
+                        <h4 class="font-semibold text-sm leading-tight text-white mb-1 line-clamp-2">${item.name}</h4>
+                        <span class="text-xs text-gray-400 mt-auto">${item.releaseInfo || item.year || ''}</span>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => openModal(item, type));
+                postersGrid.appendChild(card);
+            });
+        }
+
+        // --- Modal & Cache Checking Logic ---
+        function openModal(item, type) {
+            if (!torboxApiKey) {
+                alert("Por favor, insira e salve sua Chave de API do Torbox primeiro.");
+                setupSection.classList.remove('hidden');
+                apiKeyInput.focus();
+                return;
+            }
+
+            // Populate Modal Header
+            modalTitle.textContent = item.name;
+            modalYear.textContent = item.releaseInfo || item.year || 'N/A';
+            modalTypeBadge.textContent = type;
+            modalTypeBadge.className = `px-2 py-0.5 rounded text-xs uppercase tracking-wider font-semibold text-black ${type === 'movie' ? 'bg-blue-400' : 'bg-purple-400'}`;
+            
+            if (type === 'series') {
+                seriesNote.classList.remove('hidden');
+            } else {
+                seriesNote.classList.add('hidden');
+            }
+
+            // Reset UI states
+            modalLoader.classList.remove('hidden');
+            modalLoaderText.textContent = "Buscando fontes no Torrentio...";
+            modalError.classList.add('hidden');
+            streamsList.classList.add('hidden');
+            streamsList.innerHTML = '';
+            streamsEmpty.classList.add('hidden');
+            
+            document.body.style.overflow = 'hidden';
+            detailsModal.classList.remove('hidden');
+
+            processCacheChecking(item, type);
+        }
+
+        function closeModal() {
+            detailsModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        async function processCacheChecking(item, type) {
+            try {
+                // 1. Fetch Torrentio Streams
+                let queryId = item.imdb_id || item.id; // Cinemeta usually provides imdb_id as 'id'
+                if (!queryId) throw new Error("Item has no standard ID.");
+                
+                if (type === 'series') {
+                    queryId = `${queryId}:1:1`;
+                }
+
+                modalLoaderText.textContent = "Buscando streams no Torrentio...";
+                const streamUrl = `https://torrentio.strem.fun/stream/${type}/${queryId}.json`;
+                
+                const tRes = await fetch(streamUrl);
+                if (!tRes.ok) throw new Error(`Torrentio retornou erro ${tRes.status}`);
+                const tData = await tRes.json();
+                
+                let streams = tData.streams || [];
+                
+                // --- CAM/TS FILTER START ---
+                // Regex para ignorar CAM, HDCAM e TS usando \b para garantir limites de palavras (Ex: ignora "TS" mas não "Batsman")
+                const camRegex = /\b(cam|hdcam|ts|telesync)\b/i;
+                streams = streams.filter(s => {
+                    const combined = `${s.title || ''} ${s.name || ''}`;
+                    return !camRegex.test(combined);
+                });
+                // --- CAM/TS FILTER END ---
+
+                if (streams.length === 0) {
+                    showEmpty("Nenhum stream válido (sem ser de cinema) encontrado no Torrentio.");
+                    return;
+                }
+
+                // 2. Extract Hashes
+                const hashMap = new Map(); // hash -> stream object
+                streams.forEach(s => {
+                    if (s.infoHash) {
+                        hashMap.set(s.infoHash.toLowerCase(), s);
+                    }
+                });
+
+                const allHashes = Array.from(hashMap.keys());
+                if (allHashes.length === 0) {
+                    showEmpty("Nenhuma hash de torrent válida encontrada nas fontes.");
+                    return;
+                }
+
+                // 3. Query Torbox in Chunks
+                modalLoaderText.textContent = `Verificando cache do Torbox para ${allHashes.length} itens...`;
+                const cachedHashes = await checkTorboxCache(allHashes, torboxApiKey);
+
+                // 4. Filter and Render
+                if (cachedHashes.size === 0) {
+                    showEmpty();
+                    return;
+                }
+
+                const cachedStreams = [];
+                cachedHashes.forEach(h => {
+                    if (hashMap.has(h)) cachedStreams.push(hashMap.get(h));
+                });
+
+                renderStreams(cachedStreams);
+
+            } catch (err) {
+                console.error(err);
+                modalLoader.classList.add('hidden');
+                modalErrorText.textContent = err.message;
+                modalError.classList.remove('hidden');
+            }
+        }
+
+        async function checkTorboxCache(hashes, apiKey) {
+            const cachedSet = new Set();
+            const chunkSize = 50;
+
+            for (let i = 0; i < hashes.length; i += chunkSize) {
+                const chunk = hashes.slice(i, i + chunkSize);
+                try {
+                    // Using standard v1 checkcached endpoint with format=list
+                    const url = `https://api.torbox.app/v1/api/torrents/checkcached?hash=${chunk.join(',')}&format=list`;
+                    const res = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`
+                        }
+                    });
+                    
+                    if (!res.ok) {
+                        console.warn(`Torbox API chunk failed: ${res.status}`);
+                        continue; // Skip failed chunk, try next
+                    }
+
+                    const json = await res.json();
+                    
+                    if (json.success && json.data) {
+                        // Handle standard Torbox cache response
+                        if (Array.isArray(json.data)) {
+                            // Arrays of cached hashes
+                            json.data.forEach(h => {
+                                if (typeof h === 'string') cachedSet.add(h.toLowerCase());
+                                else if (h && h.hash) cachedSet.add(h.hash.toLowerCase());
+                            });
+                        } else if (typeof json.data === 'object') {
+                            // Object { hash1: true, hash2: false }
+                            Object.entries(json.data).forEach(([hash, isCached]) => {
+                                if (isCached) cachedSet.add(hash.toLowerCase());
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error("Cache check chunk error:", e);
+                }
+            }
+
+            return cachedSet;
+        }
+
+        function renderStreams(streams) {
+            modalLoader.classList.add('hidden');
+            streamsList.innerHTML = '';
+            
+            // Optional: Sort by quality implicitly by keeping Torrentio's order (usually 4k -> 1080p -> etc)
+            
+            streams.forEach(stream => {
+                // Parse quality/resolution from title or name
+                const rawName = stream.name || 'Torrent';
+                const titleStr = stream.title || '';
+                const parts = titleStr.split('\n');
+                const cleanTitle = parts[0] || 'Unknown Title';
+                const sizeInfo = parts.find(p => p.includes('GB') || p.includes('MB')) || '';
+                
+                // Determine badge color based on name (Torrentio uses formatting like [4k] etc)
+                let qColor = "bg-gray-700 text-gray-200";
+                if (rawName.toLowerCase().includes("4k") || rawName.toLowerCase().includes("2160p")) qColor = "bg-yellow-600 text-yellow-50";
+                else if (rawName.toLowerCase().includes("1080p")) qColor = "bg-blue-600 text-blue-50";
+                
+                const card = document.createElement('div');
+                card.className = "surface rounded-lg p-4 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center border border-gray-700 hover:border-[#bb86fc] transition shadow-md bg-[#1e1e1e] hover:bg-[#252525]";
+                
+                card.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                            <span class="${qColor} px-2 py-0.5 rounded text-xs font-bold whitespace-nowrap">
+                                ${rawName.replace('Torrentio\n', '')}
+                            </span>
+                            ${sizeInfo ? `<span class="text-xs text-gray-400 bg-gray-800 px-2 py-0.5 rounded whitespace-nowrap">${sizeInfo.replace('👤', '').trim()}</span>` : ''}
+                        </div>
+                        <h4 class="text-sm font-medium text-gray-200 break-words line-clamp-2" title="${cleanTitle}">
+                            ${cleanTitle}
+                        </h4>
+                        <div class="text-xs text-gray-500 mt-1 font-mono break-all">${stream.infoHash}</div>
+                    </div>
+                    
+                    <div class="flex items-center shrink-0">
+                        <div class="bg-green-900 bg-opacity-40 text-green-400 border border-green-800 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="text-xs font-bold tracking-wide">NO CACHE</span>
+                        </div>
+                    </div>
+                `;
+                
+                streamsList.appendChild(card);
+            });
+            
+            streamsList.classList.remove('hidden');
+        }
+
+        function showEmpty(msg = "Não encontramos nenhum arquivo em cache no Torbox pronto para streaming instantâneo via Torrentio.") {
+            modalLoader.classList.add('hidden');
+            streamsEmpty.querySelector('p').textContent = msg;
+            streamsEmpty.classList.remove('hidden');
+        }
+
+        // Start
+        init();
+
+    </script>
+</body>
+</html>
