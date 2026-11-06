@@ -455,9 +455,9 @@
                 const allHashes = Array.from(hashMap.keys());
                 if (allHashes.length === 0) return setModalState('empty', "Não foi possível extrair Hashes válidas dos resultados.");
 
-                // 3. TORBOX (Com sistema de Fallback CORS Proxy iterativo)
-                setModalState('loading', `Verificando o cache do Torbox para ${allHashes.length} torrents...`, 'Tentativa direta inicial...');
-                const cachedHashes = await checkTorboxCacheWithFallback(allHashes, torboxApiKey);
+                // 3. TORBOX (Com sistema Proxy Cloudflare)
+                setModalState('loading', `Verificando o cache do Torbox para ${allHashes.length} torrents...`, 'Consultando via Proxy Cloudflare...');
+                const cachedHashes = await checkTorboxCache(allHashes, torboxApiKey);
 
                 // 4. Renderização
                 if (cachedHashes.size === 0) {
@@ -465,76 +465,58 @@
                 }
 
                 const cachedStreams = [];
-        // Função robusta com fallback iterativo para múltiplos proxies CORS
-        async function checkTorboxCacheWithFallback(hashes, apiKey) {
+                // Filtrar e preparar apenas os que estão em cache
+                streams.forEach(s => {
+                    const hash = s.infoHash || (s.url && s.url.match(/btih:([a-zA-Z0-9]+)/)?.[1]);
+                    if (hash && cachedHashes.has(hash.toLowerCase())) {
+                        cachedStreams.push(s);
+                    }
+                });
+
+                if (cachedStreams.length === 0) {
+                    return setModalState('empty', "Nenhum dos arquivos filtrados está em cache no Torbox (apenas versões ignoradas/CAM).");
+                }
+
+                renderStreams(cachedStreams);
+
+            } catch (err) {
+                console.error(err);
+                setModalState('error', `Ocorreu um erro no processo:\n\n${err.message}`);
+            }
+        }
+
+        // Função direta usando o Proxy Cloudflare criado pelo usuário
+        async function checkTorboxCache(hashes, apiKey) {
             const cachedSet = new Set();
             const chunkSize = 50;
-            const proxies = [
-                'https://corsproxy.io/?',
-                'https://api.allorigins.win/raw?url=',
-                'https://thingproxy.freeboard.io/fetch/'
-            ];
+            const proxyUrlBase = 'https://nameless-rice-7971.giulioadriano.workers.dev/?url=';
 
             for (let i = 0; i < hashes.length; i += chunkSize) {
                 const chunk = hashes.slice(i, i + chunkSize);
                 const rawUrl = `https://api.torbox.app/v1/api/torrents/checkcached?hash=${chunk.join(',')}&format=list`;
                 
-                let requestSuccess = false;
-                let errorLogs = [];
+                // Envolvemos a URL da API do Torbox no seu Proxy do Cloudflare
+                const proxyUrl = proxyUrlBase + encodeURIComponent(rawUrl);
 
-                // Tentativa 1: Fetch Direto (Costuma falhar no browser por CORS)
                 try {
-                    const res = await fetch(rawUrl, {
+                    const res = await fetch(proxyUrl, {
                         method: 'GET',
+                        // O proxy pega isso e repassa em segurança para a API real
                         headers: { 'Authorization': `Bearer ${apiKey}` }
                     });
                     
                     if (res.ok) {
                         const json = await res.json();
                         parseTorboxResponse(json, cachedSet);
-                        requestSuccess = true;
                     } else {
-                        // Se for erro de autenticação (401/403), o problema é a chave. Parar imediatamente.
                         if (res.status === 401 || res.status === 403) {
                             throw new Error(`A Chave de API do Torbox foi rejeitada (Erro HTTP ${res.status}). Verifique nas configurações se inseriu a chave correta.`);
                         }
-                        errorLogs.push(`Acesso direto falhou: HTTP ${res.status}`);
+                        throw new Error(`A API do Torbox retornou um erro via Proxy (HTTP ${res.status}).`);
                     }
                 } catch (err) {
-                    if (err.message.includes("Chave de API")) throw err; // Propaga erro de Auth
-                    errorLogs.push(`Acesso direto falhou: ${err.message}`);
-                }
-
-                // Tentativa 2: Múltiplos Proxies CORS (Se a tentativa direta falhou)
-                if (!requestSuccess) {
-                    for (let p = 0; p < proxies.length; p++) {
-                        const proxyPrefix = proxies[p];
-                        UI.modalDebugText.textContent = `Acesso direto bloqueado. Tentando proxy ${p+1}/${proxies.length}...`;
-                        
-                        try {
-                            const proxyUrl = `${proxyPrefix}${encodeURIComponent(rawUrl)}`;
-                            const res = await fetch(proxyUrl, {
-                                method: 'GET',
-                                headers: { 'Authorization': `Bearer ${apiKey}` }
-                            });
-
-                            if (res.ok) {
-                                const json = await res.json();
-                                parseTorboxResponse(json, cachedSet);
-                                requestSuccess = true;
-                                break; // Sucesso, abortar loop de proxies
-                            } else {
-                                errorLogs.push(`Proxy ${p+1} (${proxyPrefix}): Erro HTTP ${res.status}`);
-                            }
-                        } catch (err) {
-                            errorLogs.push(`Proxy ${p+1} falhou: ${err.message}`);
-                        }
-                    }
-                }
-
-                // Se todas as tentativas falharem, reportar erro detalhado
-                if (!requestSuccess) {
-                     throw new Error(`Falha total de conexão com a API do Torbox. Todas as rotas esgotadas.\n\nLogs de Diagnóstico:\n- ${errorLogs.join('\n- ')}`);
+                    if (err.message.includes("Chave de API")) throw err;
+                    throw new Error(`Falha de comunicação com o Proxy ou com a API do Torbox.\nDetalhes: ${err.message}`);
                 }
             }
 
