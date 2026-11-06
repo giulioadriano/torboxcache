@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -94,17 +94,17 @@
         <!-- Secção de Configuração -->
         <div id="setupSection" class="surface rounded-xl p-6 mb-8 shadow-xl max-w-3xl mx-auto border border-gray-800 hidden">
             <h2 class="text-xl font-semibold mb-2 text-white">Configuração da API</h2>
-            <p class="text-sm text-gray-400 mb-4">Insira a sua Chave de API do Torbox. Será guardada localmente no seu navegador de forma segura.</p>
+            <p class="text-sm text-gray-400 mb-4">Insira sua Chave de API do Torbox. Ela será salva localmente no seu navegador de forma segura.</p>
             <div class="flex flex-col sm:flex-row gap-3">
                 <input type="password" id="apiKeyInput" placeholder="Bearer eyJhb..." 
                        class="flex-1 bg-black border border-gray-700 rounded-lg px-4 py-2.5 text-white focus-ring placeholder-gray-600 transition outline-none">
                 <button id="saveApiBtn" class="accent-bg font-medium rounded-lg px-6 py-2.5 transition shadow-lg whitespace-nowrap">
-                    Guardar Chave
+                    Salvar Chave
                 </button>
             </div>
             <div id="setupMsg" class="mt-3 text-sm text-green-400 font-medium hidden flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                Chave guardada com sucesso!
+                Chave salva com sucesso!
             </div>
         </div>
 
@@ -134,7 +134,7 @@
         <div id="resultsInfo" class="mb-6 text-gray-300 font-medium text-lg hidden border-b border-gray-800 pb-2"></div>
         <div id="mainLoader" class="flex flex-col items-center justify-center py-20 hidden">
             <div class="loader loader-lg mb-4"></div>
-            <p class="text-gray-400 animate-pulse">A procurar no Cinemeta...</p>
+            <p class="text-gray-400 animate-pulse">Buscando no Cinemeta...</p>
         </div>
 
         <!-- Grelha de Posters -->
@@ -150,7 +150,7 @@
                 </svg>
             </div>
             <h3 class="text-xl font-medium text-gray-300">Nenhum resultado encontrado</h3>
-            <p class="text-gray-500 mt-2">Tente pesquisar com outros termos.</p>
+            <p class="text-gray-500 mt-2">Tente buscar com outros termos.</p>
         </div>
     </main>
 
@@ -169,7 +169,7 @@
                         <span id="modalYear" class="text-sm font-medium text-gray-400">YYYY</span>
                     </div>
                     <p id="seriesNote" class="text-xs text-yellow-500 mt-3 font-medium bg-yellow-500/10 inline-block px-2 py-1 rounded border border-yellow-500/20 hidden">
-                        A procurar fontes para a Temporada 1, Episódio 1.
+                        Buscando fontes para a Temporada 1, Episódio 1.
                     </p>
                 </div>
                 <button id="closeModalBtn" class="text-gray-400 hover:text-white bg-gray-800/80 hover:bg-gray-700 rounded-full p-2.5 transition absolute top-6 right-6 focus-ring">
@@ -183,7 +183,7 @@
                 <!-- Loading Modal -->
                 <div id="modalLoader" class="flex flex-col items-center justify-center py-16">
                     <div class="loader mb-5"></div>
-                    <p id="modalLoaderText" class="text-gray-300 font-medium text-center">A contactar Torrentio...</p>
+                    <p id="modalLoaderText" class="text-gray-300 font-medium text-center">Contatando Torrentio...</p>
                     <p id="modalDebugText" class="text-gray-500 text-xs mt-2 text-center max-w-md hidden"></p>
                 </div>
                 
@@ -210,8 +210,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                         </svg>
                     </div>
-                    <h4 class="text-xl font-semibold text-gray-200 mb-2">Nenhum ficheiro em cache</h4>
-                    <p id="streamsEmptyText" class="text-gray-400 max-w-md mx-auto text-sm">Não encontrámos versões instantâneas prontas para stream no Torbox que correspondam a este título.</p>
+                    <h4 class="text-xl font-semibold text-gray-200 mb-2">Nenhum arquivo em cache</h4>
+                    <p id="streamsEmptyText" class="text-gray-400 max-w-md mx-auto text-sm">Não encontramos versões instantâneas prontas para stream no Torbox correspondentes a este título.</p>
                 </div>
 
             </div>
@@ -359,7 +359,7 @@
         // --- Lógica Principal (Torrentio + Torbox) ---
         function openModal(item, type) {
             if (!torboxApiKey) {
-                alert("Por favor, insira a sua Chave de API do Torbox nas configurações primeiro.");
+                alert("Por favor, insira sua Chave de API do Torbox nas configurações primeiro.");
                 UI.setupSection.classList.remove('hidden');
                 UI.apiKeyInput.focus();
                 window.scrollTo(0, 0);
@@ -375,7 +375,7 @@
             UI.seriesNote.classList.toggle('hidden', type !== 'series');
 
             // Reset UI Modal
-            setModalState('loading', 'A conectar ao Torrentio para obter streams...');
+            setModalState('loading', 'Conectando ao Torrentio para obter streams...');
             UI.streamsList.innerHTML = '';
             
             document.body.style.overflow = 'hidden';
@@ -417,22 +417,22 @@
         async function processCacheChecking(item, type) {
             try {
                 let queryId = item.imdb_id || item.id;
-                if (!queryId) throw new Error("O título não possui um ID standard (IMDB ID).");
+                if (!queryId) throw new Error("O título não possui um ID padrão (IMDB ID).");
                 if (type === 'series') queryId = `${queryId}:1:1`; // T1 E1
 
                 // 1. TORRENTIO
-                setModalState('loading', 'A obter lista de Torrents...', `A contactar: torrentio.strem.fun`);
+                setModalState('loading', 'Obtendo lista de torrents...', `Contatando: torrentio.strem.fun`);
                 const streamUrl = `https://torrentio.strem.fun/stream/${type}/${queryId}.json`;
                 
                 let tRes;
                 try {
                     tRes = await fetch(streamUrl);
                 } catch (netErr) {
-                    throw new Error(`Erro de rede ao aceder ao Torrentio.\nO seu browser pode estar a bloquear (CORS/Adblock).\nDetalhe: ${netErr.message}`);
+                    throw new Error(`Erro de rede ao acessar o Torrentio.\nSeu navegador pode estar bloqueando (CORS/Adblock).\nDetalhe: ${netErr.message}`);
                 }
                 
-                if (tRes.status === 429) throw new Error("Fomos bloqueados por excesso de pedidos (Rate Limit 429) no Torrentio. Aguarde 1-2 minutos.");
-                if (!tRes.ok) throw new Error(`O Torrentio devolveu erro HTTP ${tRes.status}`);
+                if (tRes.status === 429) throw new Error("Fomos bloqueados por excesso de requisições (Rate Limit 429) no Torrentio. Aguarde 1-2 minutos.");
+                if (!tRes.ok) throw new Error(`O Torrentio retornou erro HTTP ${tRes.status}`);
                 
                 const tData = await tRes.json();
                 let streams = tData.streams || [];
@@ -442,7 +442,7 @@
                 streams = streams.filter(s => !camRegex.test(`${s.title || ''} ${s.name || ''}`));
 
                 if (streams.length === 0) {
-                    return setModalState('empty', "Nenhuma versão de alta qualidade encontrada no Torrentio (foram ignoradas as versões de Cinema/CAM).");
+                    return setModalState('empty', "Nenhuma versão de alta qualidade encontrada no Torrentio (versões de Cinema/CAM foram ignoradas).");
                 }
 
                 // 2. Extração de Hashes
@@ -455,39 +455,32 @@
                 const allHashes = Array.from(hashMap.keys());
                 if (allHashes.length === 0) return setModalState('empty', "Não foi possível extrair Hashes válidas dos resultados.");
 
-                // 3. TORBOX (Com sistema de Fallback CORS Proxy)
-                setModalState('loading', `A verificar a cache do Torbox para ${allHashes.length} torrents...`, 'Tentativa direta inicial...');
+                // 3. TORBOX (Com sistema de Fallback CORS Proxy iterativo)
+                setModalState('loading', `Verificando o cache do Torbox para ${allHashes.length} torrents...`, 'Tentativa direta inicial...');
                 const cachedHashes = await checkTorboxCacheWithFallback(allHashes, torboxApiKey);
 
                 // 4. Renderização
                 if (cachedHashes.size === 0) {
-                    return setModalState('empty', "Nenhum dos ficheiros encontrados no Torrentio encontra-se atualmente em cache no Torbox.");
+                    return setModalState('empty', "Nenhum dos arquivos encontrados no Torrentio está atualmente em cache no Torbox.");
                 }
 
                 const cachedStreams = [];
-                cachedHashes.forEach(h => {
-                    if (hashMap.has(h)) cachedStreams.push(hashMap.get(h));
-                });
-
-                renderStreams(cachedStreams);
-
-            } catch (err) {
-                console.error("Pipeline Error:", err);
-                setModalState('error', `<b>Ocorreu um erro no processo:</b>\n\n${err.message}`);
-            }
-        }
-
-        // Função robusta com fallback
+        // Função robusta com fallback iterativo para múltiplos proxies CORS
         async function checkTorboxCacheWithFallback(hashes, apiKey) {
             const cachedSet = new Set();
             const chunkSize = 50;
+            const proxies = [
+                'https://corsproxy.io/?',
+                'https://api.allorigins.win/raw?url=',
+                'https://thingproxy.freeboard.io/fetch/'
+            ];
 
             for (let i = 0; i < hashes.length; i += chunkSize) {
                 const chunk = hashes.slice(i, i + chunkSize);
                 const rawUrl = `https://api.torbox.app/v1/api/torrents/checkcached?hash=${chunk.join(',')}&format=list`;
                 
                 let requestSuccess = false;
-                let errorLog = "";
+                let errorLogs = [];
 
                 // Tentativa 1: Fetch Direto (Costuma falhar no browser por CORS)
                 try {
@@ -501,38 +494,47 @@
                         parseTorboxResponse(json, cachedSet);
                         requestSuccess = true;
                     } else {
-                        // Se for erro de autenticação, o problema é a chave e não CORS. Parar logo.
+                        // Se for erro de autenticação (401/403), o problema é a chave. Parar imediatamente.
                         if (res.status === 401 || res.status === 403) {
                             throw new Error(`A Chave de API do Torbox foi rejeitada (Erro HTTP ${res.status}). Verifique nas configurações se inseriu a chave correta.`);
                         }
-                        errorLog = `Fetch direto devolveu status ${res.status}`;
+                        errorLogs.push(`Acesso direto falhou: HTTP ${res.status}`);
                     }
                 } catch (err) {
                     if (err.message.includes("Chave de API")) throw err; // Propaga erro de Auth
-                    errorLog = `Fetch direto falhou: ${err.message}.`;
+                    errorLogs.push(`Acesso direto falhou: ${err.message}`);
                 }
 
-                // Tentativa 2: Uso do Proxy CORS (Se a tentativa direta falhou)
+                // Tentativa 2: Múltiplos Proxies CORS (Se a tentativa direta falhou)
                 if (!requestSuccess) {
-                    UI.modalDebugText.textContent = `Acesso direto bloqueado (CORS). A tentar através de Proxy...`;
-                    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(rawUrl)}`;
-                    
-                    try {
-                        const res = await fetch(proxyUrl, {
-                            method: 'GET',
-                            headers: { 'Authorization': `Bearer ${apiKey}` }
-                        });
+                    for (let p = 0; p < proxies.length; p++) {
+                        const proxyPrefix = proxies[p];
+                        UI.modalDebugText.textContent = `Acesso direto bloqueado. Tentando proxy ${p+1}/${proxies.length}...`;
+                        
+                        try {
+                            const proxyUrl = `${proxyPrefix}${encodeURIComponent(rawUrl)}`;
+                            const res = await fetch(proxyUrl, {
+                                method: 'GET',
+                                headers: { 'Authorization': `Bearer ${apiKey}` }
+                            });
 
-                        if (res.ok) {
-                            const json = await res.json();
-                            parseTorboxResponse(json, cachedSet);
-                            requestSuccess = true;
-                        } else {
-                            throw new Error(`Proxy falhou com HTTP ${res.status}. Resposta do Torbox pode estar bloqueada.`);
+                            if (res.ok) {
+                                const json = await res.json();
+                                parseTorboxResponse(json, cachedSet);
+                                requestSuccess = true;
+                                break; // Sucesso, abortar loop de proxies
+                            } else {
+                                errorLogs.push(`Proxy ${p+1} (${proxyPrefix}): Erro HTTP ${res.status}`);
+                            }
+                        } catch (err) {
+                            errorLogs.push(`Proxy ${p+1} falhou: ${err.message}`);
                         }
-                    } catch (err) {
-                        throw new Error(`Falha total de ligação ao Torbox.\n\nDetalhes da depuração:\n1. ${errorLog}\n2. Proxy erro: ${err.message}`);
                     }
+                }
+
+                // Se todas as tentativas falharem, reportar erro detalhado
+                if (!requestSuccess) {
+                     throw new Error(`Falha total de conexão com a API do Torbox. Todas as rotas esgotadas.\n\nLogs de Diagnóstico:\n- ${errorLogs.join('\n- ')}`);
                 }
             }
 
