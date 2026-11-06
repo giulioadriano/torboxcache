@@ -517,7 +517,9 @@
                 const chunk = hashes.slice(i, i + chunkSize);
                 
                 // Using standard v1 checkcached endpoint with format=list
-                const url = `https://api.torbox.app/v1/api/torrents/checkcached?hash=${chunk.join(',')}&format=list`;
+                const rawUrl = `https://api.torbox.app/v1/api/torrents/checkcached?hash=${chunk.join(',')}&format=list`;
+                // Wrapping with CORS proxy to bypass browser restrictions
+                const url = `https://corsproxy.io/?` + encodeURIComponent(rawUrl);
                 
                 let res;
                 try {
