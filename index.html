@@ -11,7 +11,7 @@
         :root {
             --bg-color: #0f0f13;
             --surface-color: #1a1a20;
-            --accent-color: #6366f1; /* Indigo */
+            --accent-color: #6366f1;
             --accent-hover: #4f46e5;
         }
 
@@ -23,64 +23,37 @@
             overflow-x: hidden;
         }
 
-        /* Scrollbar Personalizada */
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 
-        .surface { background-color: var(--surface-color); }
-        .accent-bg { background-color: var(--accent-color); color: #ffffff; }
-        .accent-bg:hover { background-color: var(--accent-hover); }
-
-        .focus-ring:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4);
-            border-color: var(--accent-color);
-        }
-
-        .poster-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-        }
-        .poster-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
-            border-color: var(--accent-color);
-        }
-
-        /* Animações do Modal */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-        .modal-backdrop { animation: fadeIn 0.2s ease-out forwards; }
-        .modal-content { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
         .loader {
             border: 3px solid rgba(255,255,255,0.1);
             border-radius: 50%;
             border-top: 3px solid var(--accent-color);
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             animation: spin 1s linear infinite;
         }
-        .loader-lg { width: 48px; height: 48px; border-width: 4px; }
-
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- Navegação -->
-    <nav class="surface border-b border-gray-800 p-4 sticky top-0 z-10 shadow-lg">
+    <!-- Navbar fixa (z-40 para ficar abaixo dos modais) -->
+    <nav class="bg-[#1a1a20] border-b border-gray-800 p-4 sticky top-0 z-40 shadow-lg">
         <div class="container mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
-                <div class="bg-indigo-500 p-2 rounded-lg text-white">
+                <div class="bg-indigo-500 p-2 rounded-lg text-white shadow-md">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
                     </svg>
                 </div>
                 <h1 class="text-xl font-bold tracking-tight">Torbox <span class="text-indigo-400 font-medium">Cache Explorer</span></h1>
             </div>
-            <button id="settingsBtn" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 p-2 rounded-full transition" title="Configurações">
+            <button onclick="openSettings()" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 p-2 rounded-full transition shadow-sm" title="Configurações">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"></circle>
                     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -90,504 +63,350 @@
     </nav>
 
     <main class="container mx-auto p-4 py-8 max-w-7xl">
-        
-        <!-- Secção de Configuração -->
-        <div id="setupSection" class="surface rounded-xl p-6 mb-8 shadow-xl max-w-3xl mx-auto border border-gray-800 hidden">
-            <h2 class="text-xl font-semibold mb-2 text-white">Configuração da API</h2>
-            <p class="text-sm text-gray-400 mb-4">Insira sua Chave de API do Torbox. Ela será salva localmente no seu navegador de forma segura.</p>
-            <div class="flex flex-col sm:flex-row gap-3">
-                <input type="password" id="apiKeyInput" placeholder="Bearer eyJhb..." 
-                       class="flex-1 bg-black border border-gray-700 rounded-lg px-4 py-2.5 text-white focus-ring placeholder-gray-600 transition outline-none">
-                <button id="saveApiBtn" class="accent-bg font-medium rounded-lg px-6 py-2.5 transition shadow-lg whitespace-nowrap">
-                    Salvar Chave
-                </button>
-            </div>
-            <div id="setupMsg" class="mt-3 text-sm text-green-400 font-medium hidden flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                Chave salva com sucesso!
-            </div>
-        </div>
-
         <!-- Barra de Pesquisa -->
         <div class="max-w-3xl mx-auto mb-10">
-            <form id="searchForm" class="flex flex-col sm:flex-row gap-3">
-                <div class="relative sm:w-1/4">
-                    <select id="searchType" class="w-full surface border border-gray-700 rounded-lg px-4 py-3.5 text-white focus-ring outline-none cursor-pointer appearance-none shadow-sm font-medium">
-                        <option value="movie">Filmes</option>
-                        <option value="series">Séries</option>
-                    </select>
-                    <svg class="w-4 h-4 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-                <div class="relative flex-1">
-                    <input type="text" id="searchInput" placeholder="Pesquisar um filme ou série..." 
-                           class="w-full surface border border-gray-700 rounded-lg pl-4 pr-12 py-3.5 text-white focus-ring placeholder-gray-500 transition outline-none shadow-sm">
-                    <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-indigo-400 transition bg-transparent border-none cursor-pointer">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </button>
-                </div>
+            <form id="searchForm" class="relative flex" onsubmit="event.preventDefault(); performSearch();">
+                <input type="text" id="searchInput" placeholder="Pesquise um filme ou série..." 
+                       class="w-full bg-[#1a1a20] border border-gray-700 rounded-xl pl-5 pr-14 py-4 text-white placeholder-gray-500 outline-none focus:border-indigo-500 shadow-sm transition">
+                <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-indigo-400 hover:text-indigo-300 transition cursor-pointer">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
             </form>
         </div>
 
-        <!-- Estado / Loading principal -->
-        <div id="resultsInfo" class="mb-6 text-gray-300 font-medium text-lg hidden border-b border-gray-800 pb-2"></div>
-        <div id="mainLoader" class="flex flex-col items-center justify-center py-20 hidden">
-            <div class="loader loader-lg mb-4"></div>
-            <p class="text-gray-400 animate-pulse">Buscando no Cinemeta...</p>
+        <!-- Estados Principais -->
+        <div id="mainLoader" class="flex flex-col items-center py-20 hidden">
+            <div class="loader mb-4"></div>
+            <p class="text-gray-400">Buscando em filmes e séries...</p>
         </div>
 
-        <!-- Grelha de Posters -->
-        <div id="postersGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-6">
-            <!-- Injetado via JS -->
-        </div>
-
-        <!-- Sem Resultados -->
-        <div id="noResultsMsg" class="text-center py-20 hidden">
-            <div class="bg-gray-800/50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                <svg class="h-10 w-10 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-            </div>
-            <h3 class="text-xl font-medium text-gray-300">Nenhum resultado encontrado</h3>
-            <p class="text-gray-500 mt-2">Tente buscar com outros termos.</p>
-        </div>
+        <!-- Grid de Resultados -->
+        <div id="resultsInfo" class="mb-4 text-gray-300 font-medium text-lg hidden"></div>
+        <div id="postersGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5"></div>
     </main>
 
-    <!-- Modal de Detalhes -->
-    <div id="detailsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 hidden">
-        <div id="modalBackdrop" class="absolute inset-0 bg-black/80 backdrop-blur-sm modal-backdrop"></div>
-        
-        <div class="surface rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col relative z-10 modal-content shadow-2xl border border-gray-700/50 overflow-hidden bg-[#15151a]">
+    <!-- Modal de Configurações (z-50) -->
+    <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-[#1a1a20] border border-gray-700 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+            <button onclick="closeSettings()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-xl font-bold text-white mb-4">Configurações</h2>
+            <label class="block text-sm text-gray-400 mb-2">Chave de API do Torbox</label>
+            <input type="password" id="apiKeyInput" placeholder="Bearer eyJhb..." class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:border-indigo-500 mb-4">
+            <button onclick="saveSettings()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg py-3 transition">Salvar Chave</button>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes / Streams (z-50) -->
+    <div id="detailsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-[#15151a] border border-gray-700 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden">
             
-            <!-- Cabeçalho do Modal -->
-            <div class="p-6 border-b border-gray-800 flex justify-between items-start bg-gradient-to-b from-[#1f1f26] to-[#15151a] relative z-20">
-                <div class="pr-10">
-                    <h3 id="modalTitle" class="text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">Título do Filme</h3>
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <span id="modalTypeBadge" class="px-2.5 py-0.5 rounded text-xs uppercase tracking-wider font-bold text-white bg-indigo-600">FILME</span>
-                        <span id="modalYear" class="text-sm font-medium text-gray-400">YYYY</span>
-                    </div>
-                    <p id="seriesNote" class="text-xs text-yellow-500 mt-3 font-medium bg-yellow-500/10 inline-block px-2 py-1 rounded border border-yellow-500/20 hidden">
-                        Buscando fontes para a Temporada 1, Episódio 1.
-                    </p>
-                </div>
-                <button id="closeModalBtn" class="text-gray-400 hover:text-white bg-gray-800/80 hover:bg-gray-700 rounded-full p-2.5 transition absolute top-6 right-6 focus-ring">
-                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            <div class="p-6 border-b border-gray-800 bg-[#1f1f26] relative">
+                <button onclick="closeDetails()" class="absolute top-6 right-6 text-gray-400 hover:text-white bg-gray-800 p-2 rounded-full">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
+                <h3 id="modalTitle" class="text-2xl font-bold text-white mb-1 pr-10">Título</h3>
+                <div class="flex items-center gap-3">
+                    <span id="modalBadge" class="px-2 py-0.5 rounded text-xs font-bold text-white uppercase tracking-wider"></span>
+                    <span id="modalYear" class="text-sm text-gray-400 font-medium"></span>
+                </div>
             </div>
 
-            <!-- Corpo do Modal -->
-            <div class="p-4 md:p-6 overflow-y-auto flex-1">
-                
-                <!-- Loading Modal -->
-                <div id="modalLoader" class="flex flex-col items-center justify-center py-16">
-                    <div class="loader mb-5"></div>
-                    <p id="modalLoaderText" class="text-gray-300 font-medium text-center">Contatando Torrentio...</p>
-                    <p id="modalDebugText" class="text-gray-500 text-xs mt-2 text-center max-w-md hidden"></p>
+            <div class="p-6 overflow-y-auto flex-1">
+                <!-- Status do Loader -->
+                <div id="streamLoader" class="flex flex-col items-center justify-center py-10">
+                    <div class="loader mb-4"></div>
+                    <p id="streamLoaderText" class="text-gray-300 font-medium text-center">Iniciando busca...</p>
                 </div>
                 
-                <!-- Erro -->
-                <div id="modalError" class="hidden py-8">
-                    <div class="bg-red-900/20 border border-red-800/50 rounded-xl p-5 max-w-2xl mx-auto">
-                        <div class="flex items-center gap-3 text-red-400 mb-2">
-                            <svg class="w-6 h-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <h4 class="font-bold text-lg">Falha na Requisição</h4>
-                        </div>
-                        <p id="modalErrorText" class="text-sm text-red-200/80 leading-relaxed font-mono whitespace-pre-wrap"></p>
-                    </div>
+                <!-- Mensagem de Erro/Vazio -->
+                <div id="streamMessage" class="hidden text-center py-10">
+                    <p id="streamMessageText" class="text-gray-400"></p>
                 </div>
 
-                <!-- Lista de Streams -->
-                <div id="streamsList" class="flex flex-col gap-3 hidden">
-                    <!-- Cards injetados aqui -->
-                </div>
-                
-                <!-- Sem resultados em cache -->
-                <div id="streamsEmpty" class="hidden text-center py-16">
-                    <div class="bg-gray-800/40 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-5">
-                        <svg class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                        </svg>
-                    </div>
-                    <h4 class="text-xl font-semibold text-gray-200 mb-2">Nenhum arquivo em cache</h4>
-                    <p id="streamsEmptyText" class="text-gray-400 max-w-md mx-auto text-sm">Não encontramos versões instantâneas prontas para stream no Torbox correspondentes a este título.</p>
-                </div>
-
+                <!-- Lista de Streams em Cache -->
+                <div id="streamList" class="hidden flex flex-col gap-3"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- Variáveis de Estado ---
-        let torboxApiKey = localStorage.getItem('torbox_api_key_v2') || '';
-        let currentResults = [];
+        // ESTADO GLOBAL
+        let apiKey = localStorage.getItem('torbox_api_key_v3') || '';
+        
+        // ELEMENTOS DOM
+        const settingsModal = document.getElementById('settingsModal');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const searchInput = document.getElementById('searchInput');
+        const mainLoader = document.getElementById('mainLoader');
+        const resultsInfo = document.getElementById('resultsInfo');
+        const postersGrid = document.getElementById('postersGrid');
+        
+        const detailsModal = document.getElementById('detailsModal');
+        const streamLoader = document.getElementById('streamLoader');
+        const streamLoaderText = document.getElementById('streamLoaderText');
+        const streamMessage = document.getElementById('streamMessage');
+        const streamMessageText = document.getElementById('streamMessageText');
+        const streamList = document.getElementById('streamList');
 
-        // --- Elementos DOM ---
-        const UI = {
-            setupSection: document.getElementById('setupSection'),
-            settingsBtn: document.getElementById('settingsBtn'),
-            apiKeyInput: document.getElementById('apiKeyInput'),
-            saveApiBtn: document.getElementById('saveApiBtn'),
-            setupMsg: document.getElementById('setupMsg'),
-            
-            searchForm: document.getElementById('searchForm'),
-            searchInput: document.getElementById('searchInput'),
-            searchType: document.getElementById('searchType'),
-            
-            postersGrid: document.getElementById('postersGrid'),
-            mainLoader: document.getElementById('mainLoader'),
-            resultsInfo: document.getElementById('resultsInfo'),
-            noResultsMsg: document.getElementById('noResultsMsg'),
-            
-            modal: document.getElementById('detailsModal'),
-            backdrop: document.getElementById('modalBackdrop'),
-            closeBtn: document.getElementById('closeModalBtn'),
-            modalTitle: document.getElementById('modalTitle'),
-            modalYear: document.getElementById('modalYear'),
-            modalTypeBadge: document.getElementById('modalTypeBadge'),
-            seriesNote: document.getElementById('seriesNote'),
-            
-            modalLoader: document.getElementById('modalLoader'),
-            modalLoaderText: document.getElementById('modalLoaderText'),
-            modalDebugText: document.getElementById('modalDebugText'),
-            modalError: document.getElementById('modalError'),
-            modalErrorText: document.getElementById('modalErrorText'),
-            streamsList: document.getElementById('streamsList'),
-            streamsEmpty: document.getElementById('streamsEmpty'),
-            streamsEmptyText: document.getElementById('streamsEmptyText')
-        };
+        // INICIALIZAÇÃO
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!apiKey) openSettings();
+        });
 
-        // --- Inicialização ---
-        function init() {
-            if (torboxApiKey) {
-                UI.apiKeyInput.value = torboxApiKey;
-            } else {
-                UI.setupSection.classList.remove('hidden');
-            }
-
-            UI.settingsBtn.addEventListener('click', () => {
-                UI.setupSection.classList.toggle('hidden');
-                if(!UI.setupSection.classList.contains('hidden')) UI.apiKeyInput.focus();
-            });
-
-            UI.saveApiBtn.addEventListener('click', () => {
-                const val = UI.apiKeyInput.value.trim();
-                if (val) {
-                    localStorage.setItem('torbox_api_key_v2', val);
-                    torboxApiKey = val;
-                    UI.setupMsg.classList.remove('hidden');
-                    setTimeout(() => UI.setupMsg.classList.add('hidden'), 3000);
-                }
-            });
-            
-            UI.searchForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                performSearch();
-            });
-
-            UI.closeBtn.addEventListener('click', closeModal);
-            UI.backdrop.addEventListener('click', closeModal);
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && !UI.modal.classList.contains('hidden')) closeModal();
-            });
+        // FUNÇÕES DE CONFIGURAÇÃO
+        function openSettings() {
+            apiKeyInput.value = apiKey;
+            settingsModal.classList.remove('hidden');
         }
 
-        // --- Lógica de Pesquisa (Cinemeta) ---
+        function closeSettings() {
+            settingsModal.classList.add('hidden');
+        }
+
+        function saveSettings() {
+            const val = apiKeyInput.value.trim();
+            if (val) {
+                apiKey = val;
+                localStorage.setItem('torbox_api_key_v3', apiKey);
+                closeSettings();
+            }
+        }
+
+        // FUNÇÕES DE BUSCA (CINEMETA COMBINADO)
         async function performSearch() {
-            const query = UI.searchInput.value.trim();
+            const query = searchInput.value.trim();
             if (!query) return;
 
-            const type = UI.searchType.value;
-            const url = `https://v3-cinemeta.strem.io/catalog/${type}/top/search=${encodeURIComponent(query)}.json`;
-
-            // Reset UI
-            UI.postersGrid.innerHTML = '';
-            UI.resultsInfo.classList.add('hidden');
-            UI.noResultsMsg.classList.add('hidden');
-            UI.mainLoader.classList.remove('hidden');
+            postersGrid.innerHTML = '';
+            resultsInfo.classList.add('hidden');
+            mainLoader.classList.remove('hidden');
 
             try {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
-                const data = await res.json();
-                
-                currentResults = data.metas || [];
-                renderGrid(currentResults, type);
+                // Dispara busca para filmes e séries simultaneamente
+                const [resMovies, resSeries] = await Promise.all([
+                    fetch(`https://v3-cinemeta.strem.io/catalog/movie/top/search=${encodeURIComponent(query)}.json`).catch(() => null),
+                    fetch(`https://v3-cinemeta.strem.io/catalog/series/top/search=${encodeURIComponent(query)}.json`).catch(() => null)
+                ]);
+
+                let combined = [];
+
+                if (resMovies && resMovies.ok) {
+                    const data = await resMovies.json();
+                    if (data.metas) combined.push(...data.metas.map(m => ({ ...m, mediaType: 'movie' })));
+                }
+
+                if (resSeries && resSeries.ok) {
+                    const data = await resSeries.json();
+                    if (data.metas) combined.push(...data.metas.map(m => ({ ...m, mediaType: 'series' })));
+                }
+
+                if (combined.length === 0) {
+                    resultsInfo.textContent = "Nenhum resultado encontrado.";
+                    resultsInfo.classList.remove('hidden');
+                    return;
+                }
+
+                resultsInfo.textContent = `${combined.length} resultados encontrados`;
+                resultsInfo.classList.remove('hidden');
+
+                combined.forEach(item => {
+                    const isMovie = item.mediaType === 'movie';
+                    const poster = item.poster || `https://placehold.co/400x600/1a1a20/666666?text=${encodeURIComponent(item.name)}`;
+                    
+                    const card = document.createElement('div');
+                    card.className = "bg-[#1a1a20] rounded-xl overflow-hidden cursor-pointer border border-gray-800 hover:border-indigo-500 transition-all hover:-translate-y-1 shadow-lg group";
+                    card.innerHTML = `
+                        <div class="aspect-[2/3] w-full bg-black relative">
+                            <img src="${poster}" alt="${item.name}" loading="lazy" class="w-full h-full object-cover">
+                            <div class="absolute top-2 right-2 px-2 py-1 rounded text-[10px] font-bold text-white shadow ${isMovie ? 'bg-indigo-600' : 'bg-purple-600'}">
+                                ${isMovie ? 'FILME' : 'SÉRIE'}
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-bold text-sm text-gray-100 line-clamp-1">${item.name}</h4>
+                            <span class="text-xs text-gray-400">${item.releaseInfo || item.year || ''}</span>
+                        </div>
+                    `;
+                    card.onclick = () => openDetails(item);
+                    postersGrid.appendChild(card);
+                });
+
             } catch (err) {
-                console.error("Erro na pesquisa:", err);
-                UI.resultsInfo.innerHTML = `<span class="text-red-400">Falha ao procurar resultados no Cinemeta.</span>`;
-                UI.resultsInfo.classList.remove('hidden');
+                resultsInfo.textContent = "Erro ao buscar dados.";
+                resultsInfo.classList.remove('hidden');
             } finally {
-                UI.mainLoader.classList.add('hidden');
+                mainLoader.classList.add('hidden');
             }
         }
 
-        function renderGrid(metas, type) {
-            if (metas.length === 0) {
-                UI.noResultsMsg.classList.remove('hidden');
-                return;
+        // FUNÇÕES DO MODAL DE DETALHES E PROXY
+        function openDetails(item) {
+            if (!apiKey) {
+                alert("Configure a chave da API primeiro.");
+                return openSettings();
             }
 
-            UI.resultsInfo.textContent = `${metas.length} resultados encontrados para "${UI.searchInput.value}"`;
-            UI.resultsInfo.classList.remove('hidden');
+            document.getElementById('modalTitle').textContent = item.name;
+            document.getElementById('modalYear').textContent = item.releaseInfo || item.year || '';
+            const badge = document.getElementById('modalBadge');
+            badge.textContent = item.mediaType === 'movie' ? 'FILME' : 'SÉRIE';
+            badge.className = `px-2 py-0.5 rounded text-xs font-bold text-white uppercase tracking-wider ${item.mediaType === 'movie' ? 'bg-indigo-600' : 'bg-purple-600'}`;
 
-            metas.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "poster-card surface rounded-xl overflow-hidden cursor-pointer flex flex-col h-full border border-gray-800 relative group";
-                
-                const posterUrl = item.poster || `https://placehold.co/400x600/1a1a20/666666?text=${encodeURIComponent(item.name)}`;
-                
-                card.innerHTML = `
-                    <div class="aspect-[2/3] w-full overflow-hidden bg-black relative">
-                        <img src="${posterUrl}" alt="${item.name}" loading="lazy" 
-                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                             onerror="this.src='https://placehold.co/400x600/1a1a20/666666?text=Sem+Imagem'">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a20] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    </div>
-                    <div class="p-3 md:p-4 flex-1 flex flex-col relative z-10 bg-surface">
-                        <h4 class="font-bold text-sm md:text-base leading-tight text-gray-100 mb-1 line-clamp-2">${item.name}</h4>
-                        <span class="text-xs text-indigo-400 mt-auto font-medium">${item.releaseInfo || item.year || ''}</span>
-                    </div>
-                `;
-
-                card.addEventListener('click', () => openModal(item, type));
-                UI.postersGrid.appendChild(card);
-            });
-        }
-
-        // --- Lógica Principal (Torrentio + Torbox) ---
-        function openModal(item, type) {
-            if (!torboxApiKey) {
-                alert("Por favor, insira sua Chave de API do Torbox nas configurações primeiro.");
-                UI.setupSection.classList.remove('hidden');
-                UI.apiKeyInput.focus();
-                window.scrollTo(0, 0);
-                return;
-            }
-
-            // Preencher cabeçalho
-            UI.modalTitle.textContent = item.name;
-            UI.modalYear.textContent = item.releaseInfo || item.year || 'N/A';
-            UI.modalTypeBadge.textContent = type === 'movie' ? 'FILME' : 'SÉRIE';
-            UI.modalTypeBadge.className = `px-2.5 py-0.5 rounded text-xs uppercase tracking-wider font-bold text-white ${type === 'movie' ? 'bg-indigo-600' : 'bg-purple-600'}`;
-            
-            UI.seriesNote.classList.toggle('hidden', type !== 'series');
-
-            // Reset UI Modal
-            setModalState('loading', 'Conectando ao Torrentio para obter streams...');
-            UI.streamsList.innerHTML = '';
-            
+            streamList.innerHTML = '';
+            streamList.classList.add('hidden');
+            streamMessage.classList.add('hidden');
+            streamLoader.classList.remove('hidden');
+            detailsModal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            UI.modal.classList.remove('hidden');
 
-            processCacheChecking(item, type);
+            fetchStreams(item);
         }
 
-        function closeModal() {
-            UI.modal.classList.add('hidden');
+        function closeDetails() {
+            detailsModal.classList.add('hidden');
             document.body.style.overflow = '';
         }
 
-        function setModalState(state, message = '', debug = '') {
-            UI.modalLoader.classList.add('hidden');
-            UI.modalError.classList.add('hidden');
-            UI.streamsList.classList.add('hidden');
-            UI.streamsEmpty.classList.add('hidden');
-            UI.modalDebugText.classList.add('hidden');
-
-            if (state === 'loading') {
-                UI.modalLoaderText.textContent = message;
-                if(debug) {
-                    UI.modalDebugText.textContent = debug;
-                    UI.modalDebugText.classList.remove('hidden');
-                }
-                UI.modalLoader.classList.remove('hidden');
-            } else if (state === 'error') {
-                UI.modalErrorText.innerHTML = message;
-                UI.modalError.classList.remove('hidden');
-            } else if (state === 'empty') {
-                UI.streamsEmptyText.textContent = message;
-                UI.streamsEmpty.classList.remove('hidden');
-            } else if (state === 'results') {
-                UI.streamsList.classList.remove('hidden');
-            }
-        }
-
-        async function processCacheChecking(item, type) {
+        async function fetchStreams(item) {
             try {
-                let queryId = item.imdb_id || item.id;
-                if (!queryId) throw new Error("O título não possui um ID padrão (IMDB ID).");
-                if (type === 'series') queryId = `${queryId}:1:1`; // T1 E1
+                let id = item.imdb_id || item.id;
+                if (!id) throw new Error("ID não encontrado.");
+                
+                // Para séries, busca a Temporada 1, Episódio 1 por padrão
+                if (item.mediaType === 'series') id += ':1:1';
 
-                // 1. TORRENTIO
-                setModalState('loading', 'Obtendo lista de torrents...', `Contatando: torrentio.strem.fun`);
-                const streamUrl = `https://torrentio.strem.fun/stream/${type}/${queryId}.json`;
-                
-                let tRes;
-                try {
-                    tRes = await fetch(streamUrl);
-                } catch (netErr) {
-                    throw new Error(`Erro de rede ao acessar o Torrentio.\nSeu navegador pode estar bloqueando (CORS/Adblock).\nDetalhe: ${netErr.message}`);
-                }
-                
-                if (tRes.status === 429) throw new Error("Fomos bloqueados por excesso de requisições (Rate Limit 429) no Torrentio. Aguarde 1-2 minutos.");
-                if (!tRes.ok) throw new Error(`O Torrentio retornou erro HTTP ${tRes.status}`);
-                
-                const tData = await tRes.json();
-                let streams = tData.streams || [];
-                
-                // Filtro Regex para afastar gravações de cinema (CAM, TS, HDCAM)
-                const camRegex = /\b(cam|hdcam|ts|telesync)\b/i;
-                streams = streams.filter(s => !camRegex.test(`${s.title || ''} ${s.name || ''}`));
+                streamLoaderText.textContent = "Buscando fontes no Torrentio...";
 
-                if (streams.length === 0) {
-                    return setModalState('empty', "Nenhuma versão de alta qualidade encontrada no Torrentio (versões de Cinema/CAM foram ignoradas).");
-                }
+                const res = await fetch(`https://torrentio.strem.fun/stream/${item.mediaType}/${id}.json`);
+                if (!res.ok) throw new Error("Falha na resposta do Torrentio.");
+                
+                const data = await res.json();
+                let streams = data.streams || [];
 
-                // 2. Extração de Hashes
+                // 6. Filtro Anti-Gravação (CAM, HDCAM, TS, Telesync)
+                const blockedRegex = /\b(cam|hdcam|ts|telesync)\b/i;
+                streams = streams.filter(s => {
+                    const textToTest = `${s.name} ${s.title}`.toLowerCase();
+                    return !blockedRegex.test(textToTest);
+                });
+
+                if (streams.length === 0) throw new Error("Nenhuma fonte de alta qualidade encontrada.");
+
+                // Extrair InfoHashes
                 const hashMap = new Map();
                 streams.forEach(s => {
                     const hash = s.infoHash || (s.url && s.url.match(/btih:([a-zA-Z0-9]+)/)?.[1]);
                     if (hash) hashMap.set(hash.toLowerCase(), s);
                 });
 
-                const allHashes = Array.from(hashMap.keys());
-                if (allHashes.length === 0) return setModalState('empty', "Não foi possível extrair Hashes válidas dos resultados.");
+                const hashes = Array.from(hashMap.keys());
+                if (hashes.length === 0) throw new Error("Nenhum Hash válido encontrado nas fontes.");
 
-                // 3. TORBOX (Com sistema Proxy Cloudflare)
-                setModalState('loading', `Verificando o cache do Torbox para ${allHashes.length} torrents...`, 'Consultando via Proxy Cloudflare...');
-                const cachedHashes = await checkTorboxCache(allHashes, torboxApiKey);
-
-                // 4. Renderização
-                if (cachedHashes.size === 0) {
-                    return setModalState('empty', "Nenhum dos arquivos encontrados no Torrentio está atualmente em cache no Torbox.");
-                }
-
-                const cachedStreams = [];
-                // Filtrar e preparar apenas os que estão em cache
-                streams.forEach(s => {
-                    const hash = s.infoHash || (s.url && s.url.match(/btih:([a-zA-Z0-9]+)/)?.[1]);
-                    if (hash && cachedHashes.has(hash.toLowerCase())) {
-                        cachedStreams.push(s);
-                    }
-                });
-
-                if (cachedStreams.length === 0) {
-                    return setModalState('empty', "Nenhum dos arquivos filtrados está em cache no Torbox (apenas versões ignoradas/CAM).");
-                }
-
-                renderStreams(cachedStreams);
+                streamLoaderText.textContent = "Verificando cache no Torbox via Proxy...";
+                await checkTorboxCache(hashes, hashMap);
 
             } catch (err) {
-                console.error(err);
-                setModalState('error', `Ocorreu um erro no processo:\n\n${err.message}`);
+                streamLoader.classList.add('hidden');
+                streamMessageText.innerHTML = `<span class="text-red-400 font-semibold">Erro:</span> ${err.message}`;
+                streamMessage.classList.remove('hidden');
             }
         }
 
-        // Função direta usando o Proxy Cloudflare criado pelo usuário
-        async function checkTorboxCache(hashes, apiKey) {
-            const cachedSet = new Set();
-            const chunkSize = 50;
-            const proxyUrlBase = 'https://nameless-rice-7971.giulioadriano.workers.dev/?url=';
-
-            for (let i = 0; i < hashes.length; i += chunkSize) {
-                const chunk = hashes.slice(i, i + chunkSize);
-                const rawUrl = `https://api.torbox.app/v1/api/torrents/checkcached?hash=${chunk.join(',')}&format=list`;
+        async function checkTorboxCache(hashes, hashMap) {
+            try {
+                // 7. Verificação de Cache (Torbox + Proxy Cloudflare)
+                // Chunk hashes para não estourar URL longa
+                const chunkSize = 60;
+                let cachedHashes = new Set();
                 
-                // Envolvemos a URL da API do Torbox no seu Proxy do Cloudflare
-                const proxyUrl = proxyUrlBase + encodeURIComponent(rawUrl);
+                for (let i = 0; i < hashes.length; i += chunkSize) {
+                    const chunk = hashes.slice(i, i + chunkSize);
+                    const targetUrl = `https://api.torbox.app/v1/api/torrents/checkcached?hash=${chunk.join(',')}&format=list`;
+                    const proxyUrl = `https://nameless-rice-7971.giulioadriano.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
 
-                try {
                     const res = await fetch(proxyUrl, {
                         method: 'GET',
-                        // O proxy pega isso e repassa em segurança para a API real
                         headers: { 'Authorization': `Bearer ${apiKey}` }
                     });
-                    
-                    if (res.ok) {
-                        const json = await res.json();
-                        parseTorboxResponse(json, cachedSet);
-                    } else {
-                        if (res.status === 401 || res.status === 403) {
-                            throw new Error(`A Chave de API do Torbox foi rejeitada (Erro HTTP ${res.status}). Verifique nas configurações se inseriu a chave correta.`);
-                        }
-                        throw new Error(`A API do Torbox retornou um erro via Proxy (HTTP ${res.status}).`);
+
+                    if (!res.ok) {
+                        if (res.status === 401 || res.status === 403) throw new Error("Chave API do Torbox inválida.");
+                        throw new Error(`Proxy retornou HTTP ${res.status}`);
                     }
-                } catch (err) {
-                    if (err.message.includes("Chave de API")) throw err;
-                    throw new Error(`Falha de comunicação com o Proxy ou com a API do Torbox.\nDetalhes: ${err.message}`);
-                }
-            }
 
-            return cachedSet;
-        }
-
-        // O Torbox pode devolver os dados em diferentes formatos dependendo da query
-        function parseTorboxResponse(json, cachedSet) {
-            if (json && json.success && json.data) {
-                if (Array.isArray(json.data)) {
-                    json.data.forEach(h => {
-                        if (typeof h === 'string') cachedSet.add(h.toLowerCase());
-                        else if (h && h.hash) cachedSet.add(h.hash.toLowerCase());
-                    });
-                } else if (typeof json.data === 'object') {
-                    Object.entries(json.data).forEach(([hash, isCached]) => {
-                        if (isCached) cachedSet.add(hash.toLowerCase());
-                    });
+                    const json = await res.json();
+                    
+                    if (json.success && json.data) {
+                        if (Array.isArray(json.data)) {
+                            json.data.forEach(h => cachedHashes.add((typeof h === 'string' ? h : h.hash).toLowerCase()));
+                        } else if (typeof json.data === 'object') {
+                            Object.entries(json.data).forEach(([hash, isCached]) => {
+                                if (isCached) cachedHashes.add(hash.toLowerCase());
+                            });
+                        }
+                    }
                 }
+
+                // 8. Exibição dos Resultados em Cache
+                const finalStreams = [];
+                cachedHashes.forEach(hash => {
+                    if (hashMap.has(hash)) finalStreams.push(hashMap.get(hash));
+                });
+
+                streamLoader.classList.add('hidden');
+
+                if (finalStreams.length === 0) {
+                    streamMessageText.textContent = "Nenhum stream em cache encontrado no momento.";
+                    streamMessage.classList.remove('hidden');
+                    return;
+                }
+
+                renderStreams(finalStreams);
+
+            } catch (err) {
+                streamLoader.classList.add('hidden');
+                streamMessageText.innerHTML = `<span class="text-red-400 font-semibold">Erro de Proxy/Torbox:</span> ${err.message}`;
+                streamMessage.classList.remove('hidden');
             }
         }
 
         function renderStreams(streams) {
-            setModalState('results');
-            UI.streamsList.innerHTML = '';
+            streamList.innerHTML = '';
             
-            streams.forEach(stream => {
-                const rawName = stream.name || 'Torrent';
-                const titleStr = stream.title || '';
+            streams.forEach(s => {
+                const rawName = s.name || 'Torrent';
+                const titleStr = s.title || '';
                 const parts = titleStr.split('\n');
                 const cleanTitle = parts[0] || 'Título Desconhecido';
                 const sizeInfo = parts.find(p => p.includes('GB') || p.includes('MB')) || '';
-                
-                // Determina a cor da badge pela qualidade
-                let qColor = "bg-gray-700 text-gray-200 border-gray-600";
-                if (rawName.toLowerCase().includes("4k") || rawName.toLowerCase().includes("2160p")) qColor = "bg-amber-900/40 text-amber-400 border-amber-800/50";
-                else if (rawName.toLowerCase().includes("1080p")) qColor = "bg-blue-900/40 text-blue-400 border-blue-800/50";
-                
+
                 const card = document.createElement('div');
-                card.className = "bg-[#1f1f26] rounded-xl p-4 md:p-5 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center border border-gray-800/60 hover:border-indigo-500/50 transition duration-200 shadow-sm";
+                card.className = "bg-[#1a1a20] border border-emerald-900/50 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-emerald-500/50 transition";
                 
                 card.innerHTML = `
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-2 flex-wrap">
-                            <span class="border ${qColor} px-2 py-0.5 rounded text-xs font-bold whitespace-nowrap shadow-sm">
+                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                            <span class="bg-gray-800 text-gray-200 border border-gray-700 px-2 py-0.5 rounded text-xs font-bold">
                                 ${rawName.replace('Torrentio\n', '').trim()}
                             </span>
-                            ${sizeInfo ? `<span class="text-xs font-medium text-gray-400 bg-gray-800/60 border border-gray-700/50 px-2 py-0.5 rounded whitespace-nowrap flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>${sizeInfo.replace('👤', '').trim()}</span>` : ''}
+                            ${sizeInfo ? `<span class="text-gray-400 text-xs font-medium border border-gray-800 px-2 py-0.5 rounded">${sizeInfo.replace('👤', '').trim()}</span>` : ''}
                         </div>
-                        <h4 class="text-sm font-medium text-gray-200 break-words line-clamp-2 leading-relaxed" title="${cleanTitle}">
-                            ${cleanTitle}
-                        </h4>
+                        <h4 class="text-sm text-gray-200 line-clamp-2" title="${cleanTitle}">${cleanTitle}</h4>
                     </div>
-                    
-                    <div class="flex items-center shrink-0 w-full md:w-auto pt-2 md:pt-0 border-t border-gray-800 md:border-none mt-2 md:mt-0">
-                        <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3.5 py-1.5 rounded-full flex items-center justify-center gap-2 shadow-sm w-full md:w-auto">
-                            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg>
-                            <span class="text-xs font-bold tracking-wide">EM CACHE</span>
-                        </div>
+                    <div class="shrink-0 bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-emerald-500/20">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span class="text-xs font-bold uppercase tracking-wide">Cache Instântaneo</span>
                     </div>
                 `;
-                
-                UI.streamsList.appendChild(card);
+                streamList.appendChild(card);
             });
+
+            streamList.classList.remove('hidden');
         }
-
-        // Arrancar a App
-        init();
-
     </script>
 </body>
 </html>
