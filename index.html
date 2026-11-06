@@ -441,14 +441,21 @@
                 modalLoaderText.textContent = "Buscando streams no Torrentio...";
                 const streamUrl = `https://torrentio.strem.fun/stream/${type}/${queryId}.json`;
                 
-                const tRes = await fetch(streamUrl);
-                if (!tRes.ok) throw new Error(`Torrentio retornou erro ${tRes.status}`);
-                const tData = await tRes.json();
+                let tRes;
+                try {
+                    tRes = await fetch(streamUrl);
+                } catch (netErr) {
+                    throw new Error("Erro de conexão com Torrentio (possível erro de CORS ou rede).");
+                }
                 
+                if (tRes.status === 429) throw new Error("Rate Limit do Torrentio (Erro 429 - Muitas requisições). Aguarde um momento.");
+                if (!tRes.ok) throw new Error(`Torrentio retornou erro HTTP ${tRes.status}`);
+                
+                const tData = await tRes.json();
                 let streams = tData.streams || [];
                 
                 // --- CAM/TS FILTER START ---
-                // Regex para ignorar CAM, HDCAM e TS usando \b para garantir limites de palavras (Ex: ignora "TS" mas não "Batsman")
+                // Regex para ignorar CAM, HDCAM e TS usando \b para garantir limites de palavras
                 const camRegex = /\b(cam|hdcam|ts|telesync)\b/i;
                 streams = streams.filter(s => {
                     const combined = `${s.title || ''} ${s.name || ''}`;
@@ -464,19 +471,21 @@
                 // 2. Extract Hashes
                 const hashMap = new Map(); // hash -> stream object
                 streams.forEach(s => {
-                    if (s.infoHash) {
-                        hashMap.set(s.infoHash.toLowerCase(), s);
+                    // Extrai do infoHash nativo ou tenta buscar na URL caso exista
+                    const hash = s.infoHash || (s.url && s.url.match(/btih:([a-zA-Z0-9]+)/)?.[1]);
+                    if (hash) {
+                        hashMap.set(hash.toLowerCase(), s);
                     }
                 });
 
                 const allHashes = Array.from(hashMap.keys());
                 if (allHashes.length === 0) {
-                    showEmpty("Nenhuma hash de torrent válida encontrada nas fontes.");
+                    showEmpty("Nenhuma hash de torrent válida encontrada nas fontes do Torrentio.");
                     return;
                 }
 
                 // 3. Query Torbox in Chunks
-                modalLoaderText.textContent = `Verificando cache do Torbox para ${allHashes.length} itens...`;
+                modalLoaderText.textContent = `Verificando cache do Torbox para ${allHashes.length} torrents...`;
                 const cachedHashes = await checkTorboxCache(allHashes, torboxApiKey);
 
                 // 4. Filter and Render
@@ -495,7 +504,7 @@
             } catch (err) {
                 console.error(err);
                 modalLoader.classList.add('hidden');
-                modalErrorText.textContent = err.message;
+                modalErrorText.innerHTML = `<strong>Falha na Busca:</strong> ${err.message}`;
                 modalError.classList.remove('hidden');
             }
         }
@@ -506,21 +515,33 @@
 
             for (let i = 0; i < hashes.length; i += chunkSize) {
                 const chunk = hashes.slice(i, i + chunkSize);
+                
+                // Using standard v1 checkcached endpoint with format=list
+                const url = `https://api.torbox.app/v1/api/torrents/checkcached?hash=${chunk.join(',')}&format=list`;
+                
+                let res;
                 try {
-                    // Using standard v1 checkcached endpoint with format=list
-                    const url = `https://api.torbox.app/v1/api/torrents/checkcached?hash=${chunk.join(',')}&format=list`;
-                    const res = await fetch(url, {
+                    res = await fetch(url, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${apiKey}`
                         }
                     });
-                    
-                    if (!res.ok) {
-                        console.warn(`Torbox API chunk failed: ${res.status}`);
-                        continue; // Skip failed chunk, try next
-                    }
+                } catch (netErr) {
+                    throw new Error("Erro de conexão com a API do Torbox (possível erro de CORS ou rede).");
+                }
+                
+                if (res.status === 401 || res.status === 403) {
+                    throw new Error(`Chave API Inválida (Erro ${res.status}). Verifique suas configurações.`);
+                }
+                if (res.status === 429) {
+                    throw new Error("Rate Limit da API do Torbox (Erro 429).");
+                }
+                if (!res.ok) {
+                    throw new Error(`A API do Torbox retornou um erro HTTP ${res.status}`);
+                }
 
+                try {
                     const json = await res.json();
                     
                     if (json.success && json.data) {
@@ -539,7 +560,7 @@
                         }
                     }
                 } catch (e) {
-                    console.error("Cache check chunk error:", e);
+                    console.error("Erro processando JSON do Torbox:", e);
                 }
             }
 
