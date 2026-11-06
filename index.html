@@ -9,51 +9,50 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         :root {
-            --bg-color: #0f0f13;
-            --surface-color: #1a1a20;
-            --accent-color: #6366f1;
-            --accent-hover: #4f46e5;
+            --bg-color: #0b0b0f;
+            --surface-color: #16161d;
+            --accent-color: #4f46e5;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
-            color: #f3f4f6;
+            color: #e5e7eb;
             margin: 0;
             overflow-x: hidden;
         }
 
-        /* Scrollbar */
+        /* Scrollbar customizada */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 
         .loader {
-            border: 3px solid rgba(255,255,255,0.1);
+            border: 3px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             border-top: 3px solid var(--accent-color);
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased min-h-screen flex flex-col">
 
-    <!-- Navbar fixa (z-40 para ficar abaixo dos modais) -->
-    <nav class="bg-[#1a1a20] border-b border-gray-800 p-4 sticky top-0 z-40 shadow-lg">
-        <div class="container mx-auto flex items-center justify-between">
+    <!-- Navbar Fixa -->
+    <nav class="bg-[#16161d] border-b border-gray-800 p-4 sticky top-0 z-30 shadow-lg">
+        <div class="container mx-auto max-w-7xl flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
-                <div class="bg-indigo-500 p-2 rounded-lg text-white shadow-md">
+                <div class="bg-indigo-600 p-2 rounded-lg text-white shadow-md">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
                     </svg>
                 </div>
                 <h1 class="text-xl font-bold tracking-tight">Torbox <span class="text-indigo-400 font-medium">Cache Explorer</span></h1>
             </div>
-            <button onclick="openSettings()" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 p-2 rounded-full transition shadow-sm" title="Configurações">
+            <button onclick="openSettings()" class="text-gray-400 hover:text-white bg-gray-800/50 hover:bg-gray-700 p-2.5 rounded-full transition-colors shadow-sm" title="Configurações">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"></circle>
                     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -62,13 +61,14 @@
         </div>
     </nav>
 
-    <main class="container mx-auto p-4 py-8 max-w-7xl">
+    <!-- Conteúdo Principal -->
+    <main class="container mx-auto p-4 py-8 max-w-7xl flex-1">
         <!-- Barra de Pesquisa -->
-        <div class="max-w-3xl mx-auto mb-10">
-            <form id="searchForm" class="relative flex" onsubmit="event.preventDefault(); performSearch();">
-                <input type="text" id="searchInput" placeholder="Pesquise um filme ou série..." 
-                       class="w-full bg-[#1a1a20] border border-gray-700 rounded-xl pl-5 pr-14 py-4 text-white placeholder-gray-500 outline-none focus:border-indigo-500 shadow-sm transition">
-                <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-indigo-400 hover:text-indigo-300 transition cursor-pointer">
+        <div class="max-w-3xl mx-auto mb-12">
+            <form id="searchForm" class="relative flex shadow-xl" onsubmit="event.preventDefault(); performSearch();">
+                <input type="text" id="searchInput" placeholder="Pesquise filmes ou séries..." 
+                       class="w-full bg-[#16161d] border border-gray-700/50 rounded-2xl pl-6 pr-16 py-4 text-lg text-white placeholder-gray-500 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
+                <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-colors">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
@@ -76,68 +76,90 @@
             </form>
         </div>
 
-        <!-- Estados Principais -->
+        <!-- Feedback de Carregamento Principal -->
         <div id="mainLoader" class="flex flex-col items-center py-20 hidden">
             <div class="loader mb-4"></div>
-            <p class="text-gray-400">Buscando em filmes e séries...</p>
+            <p class="text-gray-400 font-medium">Buscando no Cinemeta...</p>
         </div>
 
-        <!-- Grid de Resultados -->
-        <div id="resultsInfo" class="mb-4 text-gray-300 font-medium text-lg hidden"></div>
-        <div id="postersGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5"></div>
+        <!-- Grade de Resultados -->
+        <div id="resultsInfo" class="mb-6 text-gray-300 font-medium text-lg hidden"></div>
+        <div id="postersGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6"></div>
     </main>
 
     <!-- Modal de Configurações (z-50) -->
-    <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden">
-        <div class="bg-[#1a1a20] border border-gray-700 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
-            <button onclick="closeSettings()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <div id="settingsModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-[#16161d] border border-gray-700 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+            <button onclick="closeSettings()" class="absolute top-4 right-4 text-gray-400 hover:text-white bg-gray-800/50 hover:bg-gray-700 p-1.5 rounded-full transition-colors">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <h2 class="text-xl font-bold text-white mb-4">Configurações</h2>
-            <label class="block text-sm text-gray-400 mb-2">Chave de API do Torbox</label>
-            <input type="password" id="apiKeyInput" placeholder="Bearer eyJhb..." class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:border-indigo-500 mb-4">
-            <button onclick="saveSettings()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg py-3 transition">Salvar Chave</button>
+            
+            <h2 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                <svg class="w-6 h-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                Configurações
+            </h2>
+            <p class="text-sm text-gray-400 mb-6">Insira seu Bearer token da API do Torbox para permitir a verificação de cache.</p>
+            
+            <label class="block text-sm font-medium text-gray-300 mb-2">Token de API do Torbox</label>
+            <input type="password" id="apiKeyInput" placeholder="Ex: eyJhbGciOiJIUzI1NiIs..." 
+                   class="w-full bg-[#0b0b0f] border border-gray-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 mb-6 transition-all">
+            
+            <button onclick="saveSettings()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl py-3.5 transition-colors shadow-lg shadow-indigo-600/20">
+                Salvar Configurações
+            </button>
         </div>
     </div>
 
-    <!-- Modal de Detalhes / Streams (z-50) -->
-    <div id="detailsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm hidden">
-        <div class="bg-[#15151a] border border-gray-700 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden">
+    <!-- Modal de Streams / Detalhes (z-50) -->
+    <div id="detailsModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
+        <div class="bg-[#121217] border border-gray-800 rounded-2xl w-full max-w-4xl h-[90vh] sm:h-[85vh] flex flex-col shadow-2xl relative overflow-hidden">
             
-            <div class="p-6 border-b border-gray-800 bg-[#1f1f26] relative">
-                <button onclick="closeDetails()" class="absolute top-6 right-6 text-gray-400 hover:text-white bg-gray-800 p-2 rounded-full">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <!-- Header do Modal -->
+            <div class="p-5 sm:p-6 border-b border-gray-800 bg-[#16161d] relative shrink-0">
+                <button onclick="closeDetails()" class="absolute top-5 right-5 sm:top-6 sm:right-6 text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 p-2 rounded-full transition-colors z-10">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
-                <h3 id="modalTitle" class="text-2xl font-bold text-white mb-1 pr-10">Título</h3>
-                <div class="flex items-center gap-3">
-                    <span id="modalBadge" class="px-2 py-0.5 rounded text-xs font-bold text-white uppercase tracking-wider"></span>
-                    <span id="modalYear" class="text-sm text-gray-400 font-medium"></span>
+                
+                <div class="pr-14">
+                    <h3 id="modalTitle" class="text-2xl sm:text-3xl font-bold text-white mb-2 line-clamp-2">Título</h3>
+                    <div class="flex items-center gap-3">
+                        <span id="modalBadge" class="px-2.5 py-1 rounded-md text-xs font-bold text-white uppercase tracking-wider shadow-sm"></span>
+                        <span id="modalYear" class="text-sm text-gray-400 font-medium"></span>
+                    </div>
                 </div>
             </div>
 
-            <div class="p-6 overflow-y-auto flex-1">
-                <!-- Status do Loader -->
-                <div id="streamLoader" class="flex flex-col items-center justify-center py-10">
-                    <div class="loader mb-4"></div>
-                    <p id="streamLoaderText" class="text-gray-300 font-medium text-center">Iniciando busca...</p>
+            <!-- Corpo do Modal (Rolável) -->
+            <div class="p-4 sm:p-6 overflow-y-auto flex-1 bg-gradient-to-b from-[#121217] to-[#0b0b0f]">
+                
+                <!-- Loader de Streams -->
+                <div id="streamLoader" class="flex flex-col items-center justify-center py-20 hidden">
+                    <div class="loader mb-5"></div>
+                    <p id="streamLoaderText" class="text-indigo-300 font-medium text-center text-lg animate-pulse">Iniciando busca...</p>
                 </div>
                 
-                <!-- Mensagem de Erro/Vazio -->
-                <div id="streamMessage" class="hidden text-center py-10">
-                    <p id="streamMessageText" class="text-gray-400"></p>
+                <!-- Mensagem de Status/Erro -->
+                <div id="streamMessage" class="hidden flex flex-col items-center justify-center py-16 px-4 text-center">
+                    <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 sm:p-8 max-w-xl w-full">
+                        <div id="streamMessageIcon" class="mb-4 flex justify-center"></div>
+                        <h4 id="streamMessageTitle" class="text-xl font-bold text-white mb-2"></h4>
+                        <p id="streamMessageText" class="text-gray-400 leading-relaxed text-sm sm:text-base break-words whitespace-pre-wrap font-mono bg-black/30 p-3 rounded-lg border border-gray-800/50 mt-4 text-left"></p>
+                    </div>
                 </div>
 
                 <!-- Lista de Streams em Cache -->
-                <div id="streamList" class="hidden flex flex-col gap-3"></div>
+                <div id="streamList" class="hidden flex flex-col gap-3 sm:gap-4"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // ESTADO GLOBAL
-        let apiKey = localStorage.getItem('torbox_api_key_v3') || '';
+        // CONFIGURAÇÕES GERAIS E ESTADO
+        const STORAGE_KEY = 'torbox_api_key_v4';
+        let apiKey = localStorage.getItem(STORAGE_KEY) || '';
+        const CLOUDFLARE_PROXY = 'https://nameless-rice-7971.giulioadriano.workers.dev/?url=';
         
-        // ELEMENTOS DOM
+        // REFERÊNCIAS DOM
         const settingsModal = document.getElementById('settingsModal');
         const apiKeyInput = document.getElementById('apiKeyInput');
         const searchInput = document.getElementById('searchInput');
@@ -149,34 +171,51 @@
         const streamLoader = document.getElementById('streamLoader');
         const streamLoaderText = document.getElementById('streamLoaderText');
         const streamMessage = document.getElementById('streamMessage');
+        const streamMessageIcon = document.getElementById('streamMessageIcon');
+        const streamMessageTitle = document.getElementById('streamMessageTitle');
         const streamMessageText = document.getElementById('streamMessageText');
         const streamList = document.getElementById('streamList');
 
         // INICIALIZAÇÃO
         window.addEventListener('DOMContentLoaded', () => {
-            if (!apiKey) openSettings();
+            if (!apiKey) {
+                openSettings();
+            }
         });
 
-        // FUNÇÕES DE CONFIGURAÇÃO
+        // ==========================================
+        // GERENCIAMENTO DE MODAIS (Garantindo Z-Index e Ocultação)
+        // ==========================================
         function openSettings() {
             apiKeyInput.value = apiKey;
             settingsModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeSettings() {
             settingsModal.classList.add('hidden');
+            if (detailsModal.classList.contains('hidden')) {
+                document.body.style.overflow = '';
+            }
         }
 
         function saveSettings() {
             const val = apiKeyInput.value.trim();
             if (val) {
                 apiKey = val;
-                localStorage.setItem('torbox_api_key_v3', apiKey);
+                localStorage.setItem(STORAGE_KEY, apiKey);
                 closeSettings();
             }
         }
 
-        // FUNÇÕES DE BUSCA (CINEMETA COMBINADO)
+        function closeDetails() {
+            detailsModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // ==========================================
+        // BUSCA NO CINEMETA
+        // ==========================================
         async function performSearch() {
             const query = searchInput.value.trim();
             if (!query) return;
@@ -186,7 +225,7 @@
             mainLoader.classList.remove('hidden');
 
             try {
-                // Dispara busca para filmes e séries simultaneamente
+                // Busca paralela para Filmes e Séries
                 const [resMovies, resSeries] = await Promise.all([
                     fetch(`https://v3-cinemeta.strem.io/catalog/movie/top/search=${encodeURIComponent(query)}.json`).catch(() => null),
                     fetch(`https://v3-cinemeta.strem.io/catalog/series/top/search=${encodeURIComponent(query)}.json`).catch(() => null)
@@ -205,7 +244,7 @@
                 }
 
                 if (combined.length === 0) {
-                    resultsInfo.textContent = "Nenhum resultado encontrado.";
+                    resultsInfo.textContent = "Nenhum resultado encontrado no Cinemeta.";
                     resultsInfo.classList.remove('hidden');
                     return;
                 }
@@ -213,22 +252,23 @@
                 resultsInfo.textContent = `${combined.length} resultados encontrados`;
                 resultsInfo.classList.remove('hidden');
 
+                // Renderiza os cards
                 combined.forEach(item => {
                     const isMovie = item.mediaType === 'movie';
-                    const poster = item.poster || `https://placehold.co/400x600/1a1a20/666666?text=${encodeURIComponent(item.name)}`;
+                    const poster = item.poster || `https://placehold.co/400x600/16161d/666666?text=${encodeURIComponent(item.name)}`;
                     
                     const card = document.createElement('div');
-                    card.className = "bg-[#1a1a20] rounded-xl overflow-hidden cursor-pointer border border-gray-800 hover:border-indigo-500 transition-all hover:-translate-y-1 shadow-lg group";
+                    card.className = "bg-[#16161d] rounded-xl overflow-hidden cursor-pointer border border-gray-800 hover:border-indigo-500 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-indigo-500/10 group flex flex-col";
                     card.innerHTML = `
-                        <div class="aspect-[2/3] w-full bg-black relative">
-                            <img src="${poster}" alt="${item.name}" loading="lazy" class="w-full h-full object-cover">
-                            <div class="absolute top-2 right-2 px-2 py-1 rounded text-[10px] font-bold text-white shadow ${isMovie ? 'bg-indigo-600' : 'bg-purple-600'}">
+                        <div class="aspect-[2/3] w-full bg-[#0b0b0f] relative overflow-hidden">
+                            <img src="${poster}" alt="${item.name}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute top-2 right-2 px-2 py-1 rounded text-[10px] font-bold text-white shadow-md backdrop-blur-md ${isMovie ? 'bg-indigo-600/90' : 'bg-purple-600/90'}">
                                 ${isMovie ? 'FILME' : 'SÉRIE'}
                             </div>
                         </div>
-                        <div class="p-3">
-                            <h4 class="font-bold text-sm text-gray-100 line-clamp-1">${item.name}</h4>
-                            <span class="text-xs text-gray-400">${item.releaseInfo || item.year || ''}</span>
+                        <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                            <h4 class="font-bold text-sm sm:text-base text-gray-100 line-clamp-2 mb-1 group-hover:text-indigo-400 transition-colors">${item.name}</h4>
+                            <span class="text-xs text-gray-500 font-medium">${item.releaseInfo || item.year || 'Ano Desconhecido'}</span>
                         </div>
                     `;
                     card.onclick = () => openDetails(item);
@@ -236,145 +276,202 @@
                 });
 
             } catch (err) {
-                resultsInfo.textContent = "Erro ao buscar dados.";
+                console.error(err);
+                resultsInfo.textContent = "Erro ao buscar dados. Tente novamente mais tarde.";
                 resultsInfo.classList.remove('hidden');
             } finally {
                 mainLoader.classList.add('hidden');
             }
         }
 
-        // FUNÇÕES DO MODAL DE DETALHES E PROXY
-        function openDetails(item) {
+        // ==========================================
+        // BUSCA DE STREAMS (TORRENTIO) E VERIFICAÇÃO (TORBOX)
+        // ==========================================
+        function showMessage(type, title, text) {
+            streamLoader.classList.add('hidden');
+            streamList.classList.add('hidden');
+            
+            const icons = {
+                error: `<svg class="w-12 h-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+                empty: `<svg class="w-12 h-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>`
+            };
+            
+            streamMessageIcon.innerHTML = icons[type] || icons.empty;
+            streamMessageTitle.textContent = title;
+            streamMessageTitle.className = `text-xl font-bold mb-2 ${type === 'error' ? 'text-red-400' : 'text-white'}`;
+            streamMessageText.textContent = text;
+            
+            streamMessage.classList.remove('hidden');
+        }
+
+        function setLoader(text) {
+            streamMessage.classList.add('hidden');
+            streamList.classList.add('hidden');
+            streamLoaderText.textContent = text;
+            streamLoader.classList.remove('hidden');
+        }
+
+        async function openDetails(item) {
             if (!apiKey) {
-                alert("Configure a chave da API primeiro.");
-                return openSettings();
+                openSettings();
+                return;
             }
 
+            // Preenche o cabeçalho do Modal
             document.getElementById('modalTitle').textContent = item.name;
             document.getElementById('modalYear').textContent = item.releaseInfo || item.year || '';
             const badge = document.getElementById('modalBadge');
             badge.textContent = item.mediaType === 'movie' ? 'FILME' : 'SÉRIE';
-            badge.className = `px-2 py-0.5 rounded text-xs font-bold text-white uppercase tracking-wider ${item.mediaType === 'movie' ? 'bg-indigo-600' : 'bg-purple-600'}`;
+            badge.className = `px-2.5 py-1 rounded-md text-xs font-bold text-white uppercase tracking-wider shadow-sm ${item.mediaType === 'movie' ? 'bg-indigo-600' : 'bg-purple-600'}`;
 
-            streamList.innerHTML = '';
-            streamList.classList.add('hidden');
-            streamMessage.classList.add('hidden');
-            streamLoader.classList.remove('hidden');
+            // Abre o modal
             detailsModal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            
+            setLoader("Buscando fontes no Torrentio...");
 
-            fetchStreams(item);
-        }
-
-        function closeDetails() {
-            detailsModal.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
-
-        async function fetchStreams(item) {
             try {
                 let id = item.imdb_id || item.id;
-                if (!id) throw new Error("ID não encontrado.");
+                if (!id) throw new Error("ID de mídia não encontrado para este item.");
                 
-                // Para séries, busca a Temporada 1, Episódio 1 por padrão
+                // Se for série, busca S01E01 para verificar disponibilidade geral
                 if (item.mediaType === 'series') id += ':1:1';
 
-                streamLoaderText.textContent = "Buscando fontes no Torrentio...";
-
-                const res = await fetch(`https://torrentio.strem.fun/stream/${item.mediaType}/${id}.json`);
-                if (!res.ok) throw new Error("Falha na resposta do Torrentio.");
+                // 1. Fetch no Torrentio
+                const torrentioUrl = `https://torrentio.strem.fun/stream/${item.mediaType}/${id}.json`;
+                const res = await fetch(torrentioUrl);
+                if (!res.ok) throw new Error(`Falha ao contactar Torrentio (HTTP ${res.status})`);
                 
                 const data = await res.json();
                 let streams = data.streams || [];
 
-                // 6. Filtro Anti-Gravação (CAM, HDCAM, TS, Telesync)
-                const blockedRegex = /\b(cam|hdcam|ts|telesync)\b/i;
+                if (streams.length === 0) {
+                    showMessage('empty', 'Nenhuma fonte encontrada', 'O Torrentio não retornou nenhum resultado para esta mídia.');
+                    return;
+                }
+
+                // 2. Filtro Anti-Gravação de Cinema (CAM, HDCAM, TS)
+                const blockedRegex = /\b(cam|hdcam|ts|telesync|camrip|tsrip)\b/i;
+                const originalCount = streams.length;
+                
                 streams = streams.filter(s => {
-                    const textToTest = `${s.name} ${s.title}`.toLowerCase();
+                    const textToTest = `${s.name || ''} ${s.title || ''}`.toLowerCase();
                     return !blockedRegex.test(textToTest);
                 });
 
-                if (streams.length === 0) throw new Error("Nenhuma fonte de alta qualidade encontrada.");
+                if (streams.length === 0) {
+                    showMessage('empty', 'Fontes filtradas', `Foram encontradas ${originalCount} fontes, mas todas eram qualidades de cinema (CAM/TS) e foram descartadas pelo filtro.`);
+                    return;
+                }
 
-                // Extrair InfoHashes
+                // 3. Extrair InfoHashes
                 const hashMap = new Map();
                 streams.forEach(s => {
-                    const hash = s.infoHash || (s.url && s.url.match(/btih:([a-zA-Z0-9]+)/)?.[1]);
-                    if (hash) hashMap.set(hash.toLowerCase(), s);
+                    let hash = s.infoHash;
+                    if (!hash && s.url) {
+                        const match = s.url.match(/btih:([a-zA-Z0-9]+)/i);
+                        if (match) hash = match[1];
+                    }
+                    if (hash) {
+                        hashMap.set(hash.toLowerCase(), s);
+                    }
                 });
 
                 const hashes = Array.from(hashMap.keys());
-                if (hashes.length === 0) throw new Error("Nenhum Hash válido encontrado nas fontes.");
+                if (hashes.length === 0) {
+                    throw new Error("Nenhum InfoHash válido encontrado nas fontes do Torrentio.");
+                }
 
-                streamLoaderText.textContent = "Verificando cache no Torbox via Proxy...";
+                setLoader(`Verificando cache de ${hashes.length} arquivos no Torbox...`);
                 await checkTorboxCache(hashes, hashMap);
 
             } catch (err) {
-                streamLoader.classList.add('hidden');
-                streamMessageText.innerHTML = `<span class="text-red-400 font-semibold">Erro:</span> ${err.message}`;
-                streamMessage.classList.remove('hidden');
+                console.error(err);
+                showMessage('error', 'Erro na Busca', err.message || 'Ocorreu um erro desconhecido.');
             }
         }
 
         async function checkTorboxCache(hashes, hashMap) {
             try {
-                // 7. Verificação de Cache (Torbox + Proxy Cloudflare)
-                // Chunk hashes para não estourar URL longa
-                const chunkSize = 60;
+                const chunkSize = 50; // Limite seguro para não estourar o tamanho da URL GET
                 let cachedHashes = new Set();
                 
                 for (let i = 0; i < hashes.length; i += chunkSize) {
                     const chunk = hashes.slice(i, i + chunkSize);
+                    
+                    // Constrói a URL do Torbox
                     const targetUrl = `https://api.torbox.app/v1/api/torrents/checkcached?hash=${chunk.join(',')}&format=list`;
-                    const proxyUrl = `https://nameless-rice-7971.giulioadriano.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
+                    
+                    // Constrói a URL final usando o seu Proxy Cloudflare
+                    const proxyUrl = `${CLOUDFLARE_PROXY}${encodeURIComponent(targetUrl)}`;
 
+                    // Dispara a requisição passando o Token
                     const res = await fetch(proxyUrl, {
                         method: 'GET',
-                        headers: { 'Authorization': `Bearer ${apiKey}` }
+                        headers: { 
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Accept': 'application/json'
+                        }
                     });
 
                     if (!res.ok) {
-                        if (res.status === 401 || res.status === 403) throw new Error("Chave API do Torbox inválida.");
-                        throw new Error(`Proxy retornou HTTP ${res.status}`);
+                        if (res.status === 401 || res.status === 403) {
+                            throw new Error("Acesso Negado (HTTP 401/403). Verifique se o seu Token do Torbox está correto nas configurações.");
+                        }
+                        throw new Error(`O proxy ou a API retornou um erro (HTTP ${res.status}).`);
                     }
 
                     const json = await res.json();
                     
                     if (json.success && json.data) {
                         if (Array.isArray(json.data)) {
-                            json.data.forEach(h => cachedHashes.add((typeof h === 'string' ? h : h.hash).toLowerCase()));
+                            // Formato de array
+                            json.data.forEach(h => {
+                                const hashStr = typeof h === 'string' ? h : h.hash;
+                                if (hashStr) cachedHashes.add(hashStr.toLowerCase());
+                            });
                         } else if (typeof json.data === 'object') {
+                            // Formato de objeto { "hash": true/false }
                             Object.entries(json.data).forEach(([hash, isCached]) => {
                                 if (isCached) cachedHashes.add(hash.toLowerCase());
                             });
                         }
+                    } else if (json.error) {
+                        throw new Error(`Erro do Torbox: ${json.error}`);
                     }
                 }
 
-                // 8. Exibição dos Resultados em Cache
+                // Cruza os hashes em cache com os dados originais do Torrentio
                 const finalStreams = [];
                 cachedHashes.forEach(hash => {
-                    if (hashMap.has(hash)) finalStreams.push(hashMap.get(hash));
+                    if (hashMap.has(hash)) {
+                        finalStreams.push(hashMap.get(hash));
+                    }
                 });
 
-                streamLoader.classList.add('hidden');
-
                 if (finalStreams.length === 0) {
-                    streamMessageText.textContent = "Nenhum stream em cache encontrado no momento.";
-                    streamMessage.classList.remove('hidden');
+                    showMessage('empty', 'Nenhum Stream em Cache', 'Existem arquivos no Torrentio, mas nenhum deles está pronto para streaming instantâneo no Torbox neste momento.');
                     return;
                 }
 
                 renderStreams(finalStreams);
 
             } catch (err) {
-                streamLoader.classList.add('hidden');
-                streamMessageText.innerHTML = `<span class="text-red-400 font-semibold">Erro de Proxy/Torbox:</span> ${err.message}`;
-                streamMessage.classList.remove('hidden');
+                console.error(err);
+                
+                // Mensagem amigável para NetworkError (que geralmente indica falha no Proxy ou bloqueio extremo)
+                let errorText = err.message;
+                if (errorText.includes('NetworkError') || errorText.includes('Failed to fetch')) {
+                    errorText = "Falha de conexão com o Proxy. Verifique se o Worker no Cloudflare está online, se a URL está correta e se você tem conexão com a internet.\n\nDetalhe técnico: " + errorText;
+                }
+                
+                showMessage('error', 'Falha na Verificação de Cache', errorText);
             }
         }
 
         function renderStreams(streams) {
+            streamLoader.classList.add('hidden');
+            streamMessage.classList.add('hidden');
             streamList.innerHTML = '';
             
             streams.forEach(s => {
@@ -385,21 +482,21 @@
                 const sizeInfo = parts.find(p => p.includes('GB') || p.includes('MB')) || '';
 
                 const card = document.createElement('div');
-                card.className = "bg-[#1a1a20] border border-emerald-900/50 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-emerald-500/50 transition";
+                card.className = "bg-[#1a1a24] border border-[#262633] p-4 sm:p-5 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-emerald-500/50 transition-colors shadow-sm";
                 
                 card.innerHTML = `
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1 flex-wrap">
-                            <span class="bg-gray-800 text-gray-200 border border-gray-700 px-2 py-0.5 rounded text-xs font-bold">
+                    <div class="flex-1 min-w-0 w-full">
+                        <div class="flex items-center gap-2 mb-2 flex-wrap">
+                            <span class="bg-gray-800 text-gray-200 border border-gray-700 px-2.5 py-1 rounded text-xs font-bold shadow-sm">
                                 ${rawName.replace('Torrentio\n', '').trim()}
                             </span>
-                            ${sizeInfo ? `<span class="text-gray-400 text-xs font-medium border border-gray-800 px-2 py-0.5 rounded">${sizeInfo.replace('👤', '').trim()}</span>` : ''}
+                            ${sizeInfo ? `<span class="text-gray-300 text-xs font-medium border border-gray-700 bg-gray-800/50 px-2.5 py-1 rounded shadow-sm flex items-center gap-1"><svg class="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>${sizeInfo.replace('👤', '').trim()}</span>` : ''}
                         </div>
-                        <h4 class="text-sm text-gray-200 line-clamp-2" title="${cleanTitle}">${cleanTitle}</h4>
+                        <h4 class="text-sm sm:text-base text-gray-100 line-clamp-2 leading-snug" title="${cleanTitle}">${cleanTitle}</h4>
                     </div>
-                    <div class="shrink-0 bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-emerald-500/20">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="text-xs font-bold uppercase tracking-wide">Cache Instântaneo</span>
+                    <div class="shrink-0 bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-lg flex items-center justify-center gap-2 border border-emerald-500/20 w-full md:w-auto shadow-inner">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="text-xs sm:text-sm font-bold uppercase tracking-wide">Cache Disponível</span>
                     </div>
                 `;
                 streamList.appendChild(card);
